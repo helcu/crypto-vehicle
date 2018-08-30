@@ -1,0 +1,25 @@
+{
+  "name": "crypto-vehicle",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "client": "cd src/client && npm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@material-ui/icons": "^3.0.1",
+    "express": "^4.16.3",
+    "mongoose": "^5.1.4",
+    "morgan": "^1.9.0"
+  },
+  "devDependencies": {
+    "truffle-contract": "^1.1.11",
+    "web3": "^0.20.0"
+  }
+}
