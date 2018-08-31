@@ -173,7 +173,7 @@ class Main extends React.Component {
             <Route
               exact
               path="/register"
-              Component={<RegisterView/>} />
+              component={RegisterView} />
             <Route
               exact
               path="/page2"
