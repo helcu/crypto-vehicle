@@ -56,25 +56,47 @@ const styles = theme => ({
 
 const steps = ['Datos del vehiculo', 'Imagenes', 'Documentos', 'Dueños'];
 
-function getStepContent(step) {
-  switch (step) {
-    case 0:
-      return <VehicleInfo />;
-    case 1:
-      return <ImagesVehicle />;
-    case 2:
-      return <DocumentsVehicle />;
-    case 3:
-      return <OwnersVehicle />;
-    default:
-      throw new Error('Unknown step');
-  }
-}
+
 
 class  RegisterView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { activeStep: 0,};
+    this.state = { activeStep: 0,
+      numberPlate: '123456',
+      marca:'',
+      modelo: '',
+      color:'',
+      serialNumber:'',
+      motorNumber:'',
+      reason:'',
+      images:[],
+      documents:[],
+      owners:[]
+    };
+  }
+
+   getStepContent(step) {
+    switch (step) {
+      case 0:
+        return <VehicleInfo {...this.state} update={this.updateStates}  />;
+      case 1:
+        return <ImagesVehicle {...this.state} />;
+      case 2:
+        return <DocumentsVehicle {...this.state} />;
+      case 3:
+        return <OwnersVehicle {...this.state} />;
+      default:
+        throw new Error('Unknown step');
+    }
+  }
+
+
+  updateStates = (newObject) => {
+    console.log(newObject);
+    this.setState(newObject, () =>{ console.log(this.state);} );
+
+   
+
   }
 
   handleNext = () => {
@@ -133,7 +155,7 @@ class  RegisterView extends React.Component {
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  {getStepContent(activeStep)}
+                  {this.getStepContent(activeStep)}
                   <div className={classes.buttons}>
                     {activeStep !== 0 && (
                       <Button onClick={this.handleBack} className={classes.button}>

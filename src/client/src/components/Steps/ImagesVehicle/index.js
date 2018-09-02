@@ -53,6 +53,7 @@ class ImagesVehicle extends React.Component {
       Fotos del Vehiculo
       </Typography>
       <div className="app">
+      <Grid container direction="row"  justify="center" alignItems="center">
         <ReactDropzone
           accept="image/*"
           onDrop={this.onPreviewDrop}
@@ -66,6 +67,8 @@ class ImagesVehicle extends React.Component {
         >
           Arrastrar imagenes aqui...
         </ReactDropzone>
+
+        </Grid>
         {this.state.files.length > 0 &&
           <React.Fragment>
             <h3>Previews</h3>
