@@ -14,6 +14,7 @@ import ImagesVehicle from '../Steps/ImagesVehicle';
 import DocumentsVehicle from '../Steps/DocumentsVehicle';
 import OwnersVehicle from '../Steps/OwnersVehicle';
 import getWeb3 from '../../utils/getWeb3'
+import ipfs from './../../utils/ipfs';
 
 import VehicleFactoryContract from './../../buildContracts/VehicleFactory.json'
 
@@ -58,20 +59,20 @@ const styles = theme => ({
 const steps = ['Datos', 'Fotos', 'Documentos', 'Propietarios'];
 
 
-class  RegisterView extends React.Component {
+class RegisterView extends React.Component {
   constructor(props) {
     super(props);
     this.state = { activeStep: 0,
-      numberPlate: '123456',
-      marca:'',
+      numberPlate: '',
+      marca: '',
       modelo: '',
-      color:'',
-      serialNumber:'',
-      motorNumber:'',
-      reason:'',
-      images:[],
-      documents:[],
-      owners:[],
+      color: '',
+      serialNumber: '',
+      motorNumber: '',
+      reason: '',
+      images: [],
+      documents: [],
+      owners: [],
       web3: null,
       vehicleFactoryInstance: null
     };
@@ -90,7 +91,6 @@ class  RegisterView extends React.Component {
     });
 
     await this.setState({ web3: results.web3 }, () => {
-      console.log(results.web3);
       this.initContracts();
     });
     
@@ -104,9 +104,19 @@ class  RegisterView extends React.Component {
     vehicleFactory.setProvider(this.state.web3.currentProvider);
     const vehicleFactoryInstance = await vehicleFactory.deployed();
     await this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
-    console.log("web3", this.state.web3);
-    console.log("vehicleFactoryInstance", this.state.vehicleFactoryInstance);
+
+    let _numberPlate = "";//this.state.vehicle.numberPlate + "dd";
+    let _brand = "";
+    let _model = "";
+    let _color = "";
+
+    console.log("getVehiclesFilteredWithContains", await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
+      _numberPlate, 
+      _brand, _model,
+      _color
+    ));
   }
+
    getStepContent(step) {
     switch (step) {
       case 0:
@@ -167,7 +177,7 @@ class  RegisterView extends React.Component {
       return false;
     }
 
-    _photos = "QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm";
+    //_photos = "QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm";
     _documents = "QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm";
     _ownersId = this.elementsToHex(_ownersId);
     _ownersNames = this.elementsToHex(_ownersNames);
@@ -208,9 +218,7 @@ class  RegisterView extends React.Component {
   handleRegisterVehicle = async() => {
     const web3 = this.state.web3;
     const accounts = await web3.eth.accounts;
-
-    
-    if(!accounts || !accounts[0]) {
+if(!accounts || !accounts[0]) {
       console.log("There is no account.");
 
       return;
@@ -223,11 +231,10 @@ class  RegisterView extends React.Component {
     let _serialNumber = this.state.serialNumber;
     let _motorNumber = this.state.motorNumber;
     let _reason = this.state.reason;
-    let _photos = ["Photo1", "Photo2"];
+    let _photos = await this.imageToIpfsString(this.state.images);
     let _documents = ["Doc1", "Doc2"];
     let _ownersId = ["Id1", "Id2"];
     let _ownersNames = ["Name1", "Name2"];
-    
 
     await this.execRegisterVehicle(
       _numberPlate, _brand, _model, 
@@ -235,13 +242,50 @@ class  RegisterView extends React.Component {
       _photos, _documents, _ownersId, _ownersNames,
       accounts[0]
     );
-
-  } 
+  }
   
+  imageToIpfsString = async(images) => {
+    let promises = [];
+    let ipfsArray = "";
+
+    try {
+      images.map(async(file) => {
+        promises.push(this.getIpfsString(file));
+      });
+
+      ipfsArray = await Promise.all(promises);
+    } catch(e) {
+      console.warn(e.message);
+    }
+
+    return ipfsArray.join();
+  }
+
+  getIpfsString = (file) => {
+    const reader = new FileReader();
+  
+    return new Promise((resolve, reject) => {
+      reader.onerror = () => {
+        reader.abort();
+        reject(new DOMException("Problem parsing input file."));
+      };
+  
+      reader.onload = async() => {
+        const fileAsBinaryString = reader.result;
+        let buffer = new Buffer(fileAsBinaryString, "binary");
+        let ipfsResponse = await ipfs.add(buffer);
+        resolve(ipfsResponse[0].hash);
+      };
+
+      reader.readAsBinaryString(file);
+    });
+  };
+
+
   handleNext = () => {
     if(this.state.activeStep === steps.length - 1 ){
       this.handleRegisterVehicle();
-    }else{
+    } else {
       const { activeStep } = this.state;
       this.setState({
         activeStep: activeStep + 1,

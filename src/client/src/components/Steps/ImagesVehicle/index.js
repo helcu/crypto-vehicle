@@ -7,33 +7,64 @@ import Checkbox from '@material-ui/core/Checkbox';
 import ReactDropzone from 'react-dropzone';
 import ReactDOM from 'react-dom';
 //import  '../../../../node_modules/react-dropzone-component/styles/filepicker.css'
-var ReactDOMServer = require('react-dom/server');
+import ipfs from './../../../utils/ipfs';
 
 
 class ImagesVehicle extends React.Component {
 
-  constructor(props){
-
+  constructor(props) {
     super(props);
 
     this.state = {
-      files: [],
+      images: this.props.images,
     };
-    this.onDrop = this.onDrop.bind(this);
+
     this.onPreviewDrop = this.onPreviewDrop.bind(this);
-
-   };
-
-   onPreviewDrop = (files) => {
+  };
+  
+  onPreviewDrop = (images) => {
+    
     this.setState({
-      files: this.state.files.concat(files),
-     });
+      images: this.state.images.concat(images)
+    }, () => {
+      this.props.update(this.state);
+    });
+
+    images.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const fileAsBinaryString = reader.result;
+        this.convertToBuffer(fileAsBinaryString);
+      };
+      reader.onabort = () => console.log('file reading was aborted');
+      reader.onerror = () => console.log('file reading has failed');
+      //reader.readAsBinaryString(file);
+    });
   }
 
-  onDrop = (files) => {
-    // POST to a test endpoint for demo purposes
-    files.forEach(file => {
-    
+  convertToBuffer = async(blob) => {
+    let buffer = new Buffer(blob, "binary");
+
+    await ipfs.add(buffer, (err, ipfsHash) => {
+      console.log(err, ipfsHash);
+
+      /*let photos;
+      console.log(photos);
+      if(this.state.vehicle.photos === "") {
+        photos = ipfsHash[0].hash;
+      } else {
+        photos = this.state.vehicle.photos + "," + ipfsHash[0].hash;
+      }*/
+    })
+  }
+
+  onDeletePhoto = (photoPreview) => {
+    let images = this.state.images;
+    images = images.filter((image) => {
+      return image.preview!=photoPreview
+    });
+    this.setState({images: images}, () => {
+      this.props.update(this.state);
     });
   }
 
@@ -51,7 +82,7 @@ class ImagesVehicle extends React.Component {
         Fotos
       </Typography>
       <div className="app">
-      <Grid container direction="row"  justify="center" alignItems="center">
+      <Grid container direction="row" justify="center" alignItems="center">
         <ReactDropzone
           accept="image/*"
           onDrop={this.onPreviewDrop}
@@ -63,19 +94,21 @@ class ImagesVehicle extends React.Component {
             'border-style': 'dashed',
             'border-radius': 5,}}
         >
-          Arrastrar fotos aquí...
+          <Grid container direction="column" justify="center" alignItems="center">
+            Arrastrar fotos aquí...
+          </Grid>
         </ReactDropzone>
-
         </Grid>
-        {this.state.files.length > 0 &&
+        {this.state.images.length > 0 &&
           <React.Fragment>
             <h3>Previews</h3>
-            {this.state.files.map((file) => (
+            {this.state.images.map((file) => (
               <img
                 alt="Preview"
                 key={file.preview}
                 src={file.preview}
                 style={previewStyle}
+                onClick={() => this.onDeletePhoto(file.preview)}
               />
             ))}
           </React.Fragment>
