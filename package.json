@@ -7,7 +7,10 @@
     "start": "node src/server/index.js",
     "dev": "nodemon src/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "client": "cd src/client && npm start"
+    "client": "cd src/client && npm start",
+    "server": "nodemon src/server/index.js",
+    "setup": "cd src/client && npm install",
+    "contracts": "cd src/smartContracts && truffle migrate"
   },
   "keywords": [],
   "author": "",
