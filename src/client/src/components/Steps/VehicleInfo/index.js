@@ -11,7 +11,6 @@ class VehicleInfo extends React.Component {
     super(props);
 
     this.state = {
-
       numberPlate: props.numberPlate,
       marca:props.marca,
       modelo: props.modelo,
@@ -20,16 +19,15 @@ class VehicleInfo extends React.Component {
       motorNumber:props.motorNumber,
       reason:props.reason,
     }
-
   }
-
-onUpdate= name => e =>{
-  console.log(name);
-  console.log(e.target.value);
-  this.setState({[name]: e.target.value},() =>{ this.props.update(this.state); })
-  console.log(this.state);
-
-}
+  
+  onUpdate= name => e => {
+    console.log(name);
+    console.log(e.target.value);
+    this.setState({[name]: e.target.value},() =>{ this.props.update(this.state); })
+    console.log(this.state);
+  }
+  
   render(){
   return (
     <React.Fragment>
@@ -56,6 +54,7 @@ onUpdate= name => e =>{
             name="marca"
             label="Marca"
             fullWidth
+            value = {this.state.marca}
             autoComplete="billing address-line2"
             onChange={this.onUpdate('marca')}
           />
@@ -66,6 +65,7 @@ onUpdate= name => e =>{
             name="modelo"
             label="Modelo"
             fullWidth
+            value = {this.state.modelo}
             autoComplete="billing address-line2"
             onChange={this.onUpdate('modelo')}
           />
@@ -76,6 +76,7 @@ onUpdate= name => e =>{
             name="color"
             label="Color"
             fullWidth
+            value = {this.state.color}
             autoComplete="billing address-line2"
             onChange={this.onUpdate('color')}
           />
@@ -87,6 +88,7 @@ onUpdate= name => e =>{
             name="serialNumber"
             label="Número Serial"
             fullWidth
+            value = {this.state.serialNumber}
             autoComplete="billing address-line2"
             onChange={this.onUpdate('serialNumber')}
           />
@@ -98,6 +100,7 @@ onUpdate= name => e =>{
             name="motorNumber"
             label="Número de Motor"
             fullWidth
+            value = {this.state.motorNumber}
             autoComplete="billing address-line2"
             onChange={this.onUpdate('motorNumber')}
           />
@@ -109,6 +112,7 @@ onUpdate= name => e =>{
             name="reason"
             label="Razón"
             fullWidth
+            value = {this.state.reason}
             autoComplete="billing address-line2"
             onChange={this.onUpdate('reason')}
           />
