@@ -206,11 +206,16 @@ console.log(this.state);
     console.log(web3);
     const accounts = await web3.eth.accounts;
     console.log(accounts);
-    /*if(!accounts || !accounts[0]) {
+    if(!accounts || !accounts[0]) {
       console.log("There is no account.");
-    
+      /*this.setState({ 
+        operation: {
+          status: "onError",
+          message: "No se ha encontrado ninguna cuenta."
+        }
+      });*/
       return;
-  }*/
+    }
 
     let _numberPlate = this.state.numberPlate;
     let _brand = this.state.marca;
