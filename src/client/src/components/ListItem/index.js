@@ -41,7 +41,7 @@ export const mainListItems = (
 
 export const secondaryListItems = (
   <div>
-    <ListSubheader inset>Gestion De Accesos</ListSubheader>
+    <ListSubheader inset>Gestión De Accesos</ListSubheader>
     <ListItem button>
       <ListItemIcon>
         <AssignmentIcon />

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import Typography from '@material-ui/core/Typography';
@@ -9,7 +8,6 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
-
 
 import VehicleInfo from '../Steps/VehicleInfo';
 import ImagesVehicle from '../Steps/ImagesVehicle';
@@ -54,8 +52,7 @@ const styles = theme => ({
   },
 });
 
-const steps = ['Datos del vehiculo', 'Imagenes', 'Documentos', 'Dueños'];
-
+const steps = ['Datos', 'Fotos', 'Documentos', 'Propietarios'];
 
 
 class  RegisterView extends React.Component {
@@ -127,14 +124,11 @@ class  RegisterView extends React.Component {
     <div>
       <CssBaseline />
       <Typography variant="display3" gutterBottom>
-        Registro de vehiculo
+        Registro vehicular
       </Typography>
 
       <main className={classes.layout}>
           <Paper className={classes.paper}>
-            <Typography variant="display1" align="center">
-              Ingreso de datos
-            </Typography>
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map(label => (
                 <Step key={label}>

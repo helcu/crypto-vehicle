@@ -9,7 +9,7 @@ function DocumentsVehicle() {
   return (
     <React.Fragment>
       <Typography variant="title" gutterBottom>
-      DocumentsVehicle
+        Documentos
       </Typography>
      
     </React.Fragment>
