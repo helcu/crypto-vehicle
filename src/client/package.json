@@ -17,6 +17,7 @@
     "react-scripts": "1.1.5",
     "react-uwp": "^1.2.1",
     "styled-components": "^3.2.6",
+    "truffle-contract": "^3.0.6",
     "web3": "^1.0.0-beta.35"
   },
   "proxy": "http://localhost:5000/",

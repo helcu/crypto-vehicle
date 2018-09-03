@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
+    "start": "node src/server/index.js",
+    "dev": "nodemon src/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "cd src/client && npm start"
   },
@@ -19,7 +19,6 @@
     "morgan": "^1.9.0"
   },
   "devDependencies": {
-    "truffle-contract": "^1.1.11",
-    "web3": "^0.20.0"
+    "truffle-contract": "^1.1.11"
   }
 }
