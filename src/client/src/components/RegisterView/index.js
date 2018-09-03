@@ -15,8 +15,7 @@ import DocumentsVehicle from '../Steps/DocumentsVehicle';
 import OwnersVehicle from '../Steps/OwnersVehicle';
 import getWeb3 from '../../utils/getWeb3'
 
-import VehicleFactoryContract from '../../buildContracts/VehicleFactory.json'
-
+import VehicleFactoryContract from './../../buildContracts/VehicleFactory.json'
 
 
 const styles = theme => ({
@@ -90,9 +89,11 @@ class  RegisterView extends React.Component {
       console.log('Error finding web3.')
     });
 
-    this.setState({ web3: results.web3 }, async () =>{  await this.initContracts();});
-
-  
+    await this.setState({ web3: results.web3 }, () => {
+      console.log(results.web3);
+      this.initContracts();
+    });
+    
     //await this.manageVehicles();
     //await this.getHistocalData();
   }
@@ -102,7 +103,9 @@ class  RegisterView extends React.Component {
     const vehicleFactory = contract(VehicleFactoryContract);
     vehicleFactory.setProvider(this.state.web3.currentProvider);
     const vehicleFactoryInstance = await vehicleFactory.deployed();
-    this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
+    await this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
+    console.log("web3", this.state.web3);
+    console.log("vehicleFactoryInstance", this.state.vehicleFactoryInstance);
   }
    getStepContent(step) {
     switch (step) {
@@ -136,6 +139,7 @@ class  RegisterView extends React.Component {
           message: "Este vehículo ya está registrado."
         }
       });*/
+      console.log("Este vehículo ya está registrado.");
       return false;
     }
 
@@ -147,6 +151,7 @@ class  RegisterView extends React.Component {
           message: "Este número de serie ya está registrado."
         }
       });*/
+      console.log("Este número de serie ya está registrado.");
       return false;
     }
 
@@ -158,6 +163,7 @@ class  RegisterView extends React.Component {
           message: "Este número de motor ya está registrado."
         }
       });*/
+      console.log("Este número de motor ya está registrado.");
       return false;
     }
 
@@ -200,17 +206,13 @@ class  RegisterView extends React.Component {
 
 
   handleRegisterVehicle = async() => {
-console.log(this.state);
-
     const web3 = this.state.web3;
-    console.log(web3);
     const accounts = await web3.eth.accounts;
-    console.log(accounts);
-    /*if(!accounts || !accounts[0]) {
-      console.log("There is no account.");
     
+    if(!accounts || !accounts[0]) {
+      console.log("There is no account.");
       return;
-  }*/
+    }
 
     let _numberPlate = this.state.numberPlate;
     let _brand = this.state.marca;
@@ -228,7 +230,8 @@ console.log(this.state);
     await this.execRegisterVehicle(
       _numberPlate, _brand, _model, 
       _color, _serialNumber, _motorNumber, _reason,
-      _photos, _documents, _ownersId, _ownersNames
+      _photos, _documents, _ownersId, _ownersNames,
+      accounts[0]
     );
 
   } 
