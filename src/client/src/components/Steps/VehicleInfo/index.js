@@ -34,7 +34,7 @@ onUpdate= name => e =>{
   return (
     <React.Fragment>
       <Typography variant="title" gutterBottom>
-        Datos del vehículo
+        Datos
       </Typography>
      
       <Grid container spacing={24}>
