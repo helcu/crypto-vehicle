@@ -104,6 +104,17 @@ class RegisterView extends React.Component {
     vehicleFactory.setProvider(this.state.web3.currentProvider);
     const vehicleFactoryInstance = await vehicleFactory.deployed();
     await this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
+
+    let _numberPlate = "";//this.state.vehicle.numberPlate + "dd";
+    let _brand = "";
+    let _model = "";
+    let _color = "";
+
+    console.log("getVehiclesFilteredWithContains", await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
+      _numberPlate, 
+      _brand, _model,
+      _color
+    ));
   }
 
    getStepContent(step) {
@@ -207,10 +218,6 @@ class RegisterView extends React.Component {
   handleRegisterVehicle = async() => {
     const web3 = this.state.web3;
     const accounts = await web3.eth.accounts;
-    
-    this.imageToIpfsString(this.state.images);
-    console.log(this.state.images);
-    return;
 
     if(!accounts || !accounts[0]) {
       console.log("There is no account.");
@@ -224,11 +231,10 @@ class RegisterView extends React.Component {
     let _serialNumber = this.state.serialNumber;
     let _motorNumber = this.state.motorNumber;
     let _reason = this.state.reason;
-    let _photos = ["Photo1", "Photo2"];
+    let _photos = await this.imageToIpfsString(this.state.images);
     let _documents = ["Doc1", "Doc2"];
     let _ownersId = ["Id1", "Id2"];
     let _ownersNames = ["Name1", "Name2"];
-    
 
     await this.execRegisterVehicle(
       _numberPlate, _brand, _model, 
@@ -236,48 +242,50 @@ class RegisterView extends React.Component {
       _photos, _documents, _ownersId, _ownersNames,
       accounts[0]
     );
-
-  } 
+  }
   
   imageToIpfsString = async(images) => {
-    images.forEach(async(file) => {
-      console.log(await this.getIpfsString(file));
-    });
+    let promises = [];
+    let ipfsArray = "";
+
+    try {
+      images.map(async(file) => {
+        promises.push(this.getIpfsString(file));
+      });
+
+      ipfsArray = await Promise.all(promises);
+    } catch(e) {
+      console.warn(e.message);
+    }
+
+    return ipfsArray.join();
   }
 
-  getIpfsString = async(file) => {
+  getIpfsString = (file) => {
     const reader = new FileReader();
-    reader.onload = async() => {
-      const fileAsBinaryString = reader.result;
-      let buffer = new Buffer(fileAsBinaryString, "binary");
-      return (await ipfs.add(buffer))[0].hash;
-    };
-    reader.onabort = () => console.log('file reading was aborted');
-    reader.onerror = () => console.log('file reading has failed');
-    reader.readAsBinaryString(file);
-  }
+  
+    return new Promise((resolve, reject) => {
+      reader.onerror = () => {
+        reader.abort();
+        reject(new DOMException("Problem parsing input file."));
+      };
+  
+      reader.onload = async() => {
+        const fileAsBinaryString = reader.result;
+        let buffer = new Buffer(fileAsBinaryString, "binary");
+        let ipfsResponse = await ipfs.add(buffer);
+        resolve(ipfsResponse[0].hash);
+      };
 
-  convertToBuffer = async(blob) => {
-    let buffer = new Buffer(blob, "binary");
-
-    await ipfs.add(buffer, (err, ipfsHash) => {
-      console.log(err, ipfsHash);
-
-      /*let photos;
-      console.log(photos);
-      if(this.state.vehicle.photos === "") {
-        photos = ipfsHash[0].hash;
-      } else {
-        photos = this.state.vehicle.photos + "," + ipfsHash[0].hash;
-      }*/
-    })
-  }
+      reader.readAsBinaryString(file);
+    });
+  };
 
 
   handleNext = () => {
     if(this.state.activeStep === steps.length - 1 ){
       this.handleRegisterVehicle();
-    }else{
+    } else {
       const { activeStep } = this.state;
       this.setState({
         activeStep: activeStep + 1,
