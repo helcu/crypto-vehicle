@@ -12,8 +12,6 @@ var ReactDOMServer = require('react-dom/server');
 
 class ImagesVehicle extends React.Component {
 
-
-
   constructor(props){
 
     super(props);
@@ -50,7 +48,7 @@ class ImagesVehicle extends React.Component {
     return (
     <React.Fragment>
       <Typography variant="title" gutterBottom>
-      Fotos del Vehiculo
+        Fotos
       </Typography>
       <div className="app">
       <Grid container direction="row"  justify="center" alignItems="center">
@@ -65,7 +63,7 @@ class ImagesVehicle extends React.Component {
             'border-style': 'dashed',
             'border-radius': 5,}}
         >
-          Arrastrar imagenes aqui...
+          Arrastrar fotos aquí...
         </ReactDropzone>
 
         </Grid>

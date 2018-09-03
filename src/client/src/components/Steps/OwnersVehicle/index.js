@@ -87,7 +87,7 @@ const styles = theme => ({
     return (
     <React.Fragment>
       <Typography variant="title" gutterBottom>
-      Propietarios
+        Propietarios
       </Typography>
 
       <Grid container spacing={24}>
@@ -131,8 +131,8 @@ const styles = theme => ({
         <TableHead>
           <TableRow>
             <TableCell>DNI</TableCell>
-            <TableCell >Nombre</TableCell>
-            <TableCell > opciones</TableCell>         
+            <TableCell>Nombre</TableCell>
+            <TableCell>Opciones</TableCell>         
           </TableRow>
         </TableHead>
         <TableBody>
@@ -143,7 +143,7 @@ const styles = theme => ({
                   {row.dni}
                 </TableCell>
                 <TableCell >{row.name}</TableCell>      
-                <TableCell >botones</TableCell>         
+                <TableCell >Botones</TableCell>         
               </TableRow>
             );
           })}
@@ -157,7 +157,7 @@ const styles = theme => ({
 }
 
 OwnersVehicle.propTypes = {
-    classes: PropTypes.object.isRequired,
-  };
+  classes: PropTypes.object.isRequired,
+};
 
-  export default withStyles(styles)(OwnersVehicle);
+export default withStyles(styles)(OwnersVehicle);

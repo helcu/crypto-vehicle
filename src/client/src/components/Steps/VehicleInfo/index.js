@@ -34,7 +34,7 @@ onUpdate= name => e =>{
   return (
     <React.Fragment>
       <Typography variant="title" gutterBottom>
-      Información del vehiculo
+        Datos del vehículo
       </Typography>
      
       <Grid container spacing={24}>
@@ -43,7 +43,7 @@ onUpdate= name => e =>{
           <TextField
             id="numberPlate"
             name="numberPlate"
-            label="Numero de placa"
+            label="Número de placa"
             fullWidth
             value = {this.state.numberPlate}
             autoComplete="billing address-line2"
@@ -85,7 +85,7 @@ onUpdate= name => e =>{
           <TextField
             id="serialNumber"
             name="serialNumber"
-            label="Numero Serial"
+            label="Número Serial"
             fullWidth
             autoComplete="billing address-line2"
             onChange={this.onUpdate('serialNumber')}
@@ -96,7 +96,7 @@ onUpdate= name => e =>{
           <TextField
             id="motorNumber"
             name="motorNumber"
-            label="Numero de Motor"
+            label="Número de Motor"
             fullWidth
             autoComplete="billing address-line2"
             onChange={this.onUpdate('motorNumber')}
