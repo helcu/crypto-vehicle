@@ -45,10 +45,9 @@ const styles = theme => ({
     super(props);
 
     this.state = {
-        rows : [],
+        owners : props.owners,
         dni : "",
         name : ""
-
     };
 
     this.createData = this.createData.bind(this);
@@ -66,7 +65,7 @@ const styles = theme => ({
     }
 
     addRow(newItem){
-        this.setState({rows: [...this.state.rows,newItem ]});
+        this.setState({owners: [...this.state.owners,newItem ]}, () =>{ this.props.update(this.state)});
     }
 
     addButton(){
@@ -118,7 +117,7 @@ const styles = theme => ({
           />
         </Grid>
 
-     <Grid item xs={12} direction="row"  justify="flex-end" alignItems="center" >
+     <Grid container xs={12} direction="row"  justify="flex-end" alignItems="center" >
       <Button variant="contained" color="primary" className={classes.button} onClick = {this.addButton} >
         Agregar
         <AddIcon className={classes.rightIcon} />
@@ -137,7 +136,7 @@ const styles = theme => ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {this.state.rows.map(row => {
+          {this.state.owners.map(row => {
             return (
               <TableRow key={row.id}>
                 <TableCell component="th" scope="row">

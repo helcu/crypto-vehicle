@@ -80,11 +80,11 @@ class  RegisterView extends React.Component {
       case 0:
         return <VehicleInfo {...this.state} update={this.updateStates}  />;
       case 1:
-        return <ImagesVehicle {...this.state} />;
+        return <ImagesVehicle {...this.state} update={this.updateStates}/>;
       case 2:
-        return <DocumentsVehicle {...this.state} />;
+        return <DocumentsVehicle {...this.state} update={this.updateStates}/>;
       case 3:
-        return <OwnersVehicle {...this.state} />;
+        return <OwnersVehicle {...this.state} update={this.updateStates} />;
       default:
         throw new Error('Unknown step');
     }
@@ -94,10 +94,10 @@ class  RegisterView extends React.Component {
   updateStates = (newObject) => {
     console.log(newObject);
     this.setState(newObject, () =>{ console.log(this.state);} );
-
-   
-
   }
+
+  
+
 
   handleNext = () => {
     const { activeStep } = this.state;

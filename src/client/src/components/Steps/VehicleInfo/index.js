@@ -12,18 +12,22 @@ class VehicleInfo extends React.Component {
 
     this.state = {
 
-      numberPlate: props.numberPlate
-
+      numberPlate: props.numberPlate,
+      marca:props.marca,
+      modelo: props.modelo,
+      color:props.color,
+      serialNumber:props.serialNumber,
+      motorNumber:props.motorNumber,
+      reason:props.reason,
     }
 
   }
 
-onUpdate = (e) =>{
-
+onUpdate= name => e =>{
+  console.log(name);
   console.log(e.target.value);
-  this.setState({numberPlate: e.target.value},() =>{ this.props.update(this.state); })
+  this.setState({[name]: e.target.value},() =>{ this.props.update(this.state); })
   console.log(this.state);
-  
 
 }
   render(){
@@ -43,7 +47,7 @@ onUpdate = (e) =>{
             fullWidth
             value = {this.state.numberPlate}
             autoComplete="billing address-line2"
-            onChange={this.onUpdate}
+            onChange={this.onUpdate('numberPlate')}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -53,6 +57,7 @@ onUpdate = (e) =>{
             label="Marca"
             fullWidth
             autoComplete="billing address-line2"
+            onChange={this.onUpdate('marca')}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -62,6 +67,7 @@ onUpdate = (e) =>{
             label="Modelo"
             fullWidth
             autoComplete="billing address-line2"
+            onChange={this.onUpdate('modelo')}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -71,6 +77,7 @@ onUpdate = (e) =>{
             label="Color"
             fullWidth
             autoComplete="billing address-line2"
+            onChange={this.onUpdate('color')}
           />
         </Grid>
 
@@ -81,6 +88,7 @@ onUpdate = (e) =>{
             label="Numero Serial"
             fullWidth
             autoComplete="billing address-line2"
+            onChange={this.onUpdate('serialNumber')}
           />
         </Grid>
 
@@ -91,6 +99,7 @@ onUpdate = (e) =>{
             label="Numero de Motor"
             fullWidth
             autoComplete="billing address-line2"
+            onChange={this.onUpdate('motorNumber')}
           />
         </Grid>
 
@@ -101,6 +110,7 @@ onUpdate = (e) =>{
             label="Razón"
             fullWidth
             autoComplete="billing address-line2"
+            onChange={this.onUpdate('reason')}
           />
         </Grid>
         
