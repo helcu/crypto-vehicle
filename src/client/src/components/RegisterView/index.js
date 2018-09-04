@@ -257,7 +257,7 @@ class RegisterView extends React.Component {
   handleRegisterVehicle = async() => {
     const web3 = this.state.web3;
     const accounts = await web3.eth.accounts;
-
+    
     if(!accounts || !accounts[0]) {
       console.log("There is no account.");
       return false;
