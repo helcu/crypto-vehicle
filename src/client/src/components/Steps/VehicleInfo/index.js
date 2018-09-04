@@ -94,7 +94,7 @@ class VehicleInfo extends React.Component {
           <TextField
             id="serialNumber"
             name="serialNumber"
-            label="Número Serial"
+            label="Número de Serie"
             required
             fullWidth
             value = {this.state.serialNumber}
