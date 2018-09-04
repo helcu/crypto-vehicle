@@ -2,8 +2,6 @@ import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import PropTypes from 'prop-types';
@@ -16,116 +14,112 @@ import TableRow from '@material-ui/core/TableRow';
 
 
 const styles = theme => ({
-    button: {
-      margin: theme.spacing.unit,
-    },
-    leftIcon: {
-      marginRight: theme.spacing.unit,
-    },
-    rightIcon: {
-      marginLeft: theme.spacing.unit,
-    },
-    iconSmall: {
-      fontSize: 20,
-    },
-    table: {
-        minWidth: 700,
-      },
-  });
+  button: {
+    margin: theme.spacing.unit,
+  },
+  leftIcon: {
+    marginRight: theme.spacing.unit,
+  },
+  rightIcon: {
+    marginLeft: theme.spacing.unit,
+  },
+  iconSmall: {
+    fontSize: 20,
+  },
+  table: {
+      minWidth: 700,
+  },
+});
 
-  let id = 0;
-  
+let id = 0;
+var rows = [];
 
-  var rows = [];
+class OwnersVehicle extends React.Component {
 
-  class  OwnersVehicle extends React.Component {
-
-   constructor(props){
+  constructor(props){
 
     super(props);
 
     this.state = {
-        owners : props.owners,
-        dni : "",
-        name : ""
+      owners : props.owners,
+      dni : "",
+      name : ""
     };
 
     this.createData = this.createData.bind(this);
     this.addRow = this.addRow.bind(this);
     this.addButton = this.addButton.bind(this);
-
    };
 
-  
 
-    createData(dni, name) {
+  createData(dni, name) {
     console.log(dni + name);
     id += 1;
     return { id, dni, name};
-    }
+  }
 
-    addRow(newItem){
-        this.setState({owners: [...this.state.owners,newItem ]}, () =>{ this.props.update(this.state)});
-    }
+  addRow(newItem){
+    this.setState({owners: [...this.state.owners,newItem ]}, () =>{ this.props.update(this.state)});
+  }
 
-    addButton(){
-        const addobj = this.createData(this.state.dni, this.state.name);
-        this.addRow(addobj);
-        this.setState({name: "", dni:""});
+  addButton(){
+    const addobj = this.createData(this.state.dni, this.state.name);
+    this.addRow(addobj);
+    this.setState({name: "", dni:""});
+  }
 
-    }
+  handleChange = name => event => {
+      this.setState({
+        [name]: event.target.value,
+      });
+    };
 
-
-    handleChange = name => event => {
-        this.setState({
-          [name]: event.target.value,
-        });
-      };
-
-  render(){ 
+  render() {
     const { classes } = this.props;
+
     return (
     <React.Fragment>
       <Typography variant="title" gutterBottom>
         Propietarios
       </Typography>
 
-      <Grid container spacing={24}>
-      
-      <Grid item xs={12} sm={6}>
+      <Grid container spacing={24}>    
+        <Grid item xs={12} sm={6}>
           <TextField
             id="dni"
             name="dni"
             label="DNI"
-            value={this.state.dni}
             fullWidth
-            
+            type="number"
+            value={this.state.dni}
+            inputProps={{ 
+              maxLength: 31
+            }}
             onChange={this.handleChange('dni')}
           />
         </Grid>
-
            
-      <Grid item xs={12} sm={6}  >
+        <Grid item xs={12} sm={6}  >
           <TextField
             id="nameOwner"
             name="nameOwner"
-            label="Nombre Completo"
+            label="Nombre"
             fullWidth
             value={this.state.name}
-           
+            inputProps={{ 
+              maxLength: 31
+            }}
             onChange={this.handleChange('name')}
           />
         </Grid>
 
-     <Grid container xs={12} direction="row"  justify="flex-end" alignItems="center" >
-      <Button variant="contained" color="primary" className={classes.button} onClick = {this.addButton} >
-        Agregar
-        <AddIcon className={classes.rightIcon} />
-      </Button>
+        <Grid container xs={12} direction="row"  justify="flex-end" alignItems="center" >
+          <Button variant="contained" color="primary" className={classes.button} onClick = {this.addButton} >
+            Agregar
+            <AddIcon className={classes.rightIcon} />
+          </Button>
+        </Grid>      
       </Grid>
-      
-      </Grid>
-
 
       <Table className={classes.table}>
         <TableHead>
@@ -149,11 +143,9 @@ const styles = theme => ({
           })}
         </TableBody>
       </Table>
-     
     </React.Fragment>
   );
-
-}
+  }
 }
 
 OwnersVehicle.propTypes = {

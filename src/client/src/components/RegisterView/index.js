@@ -62,7 +62,8 @@ const steps = ['Datos', 'Fotos', 'Documentos', 'Propietarios'];
 class RegisterView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { activeStep: 0,
+    this.state = { 
+      activeStep: 0,
       numberPlate: '',
       marca: '',
       modelo: '',
@@ -84,7 +85,7 @@ class RegisterView extends React.Component {
     });
   }
 
-  componentWillMount = async() => {
+  componentDidMount = async() => {
     let results = await getWeb3
     .catch(() => {
       console.log('Error finding web3.')
@@ -93,6 +94,7 @@ class RegisterView extends React.Component {
     await this.setState({ web3: results.web3 }, () => {
       this.initContracts();
     });
+    
     
     //await this.manageVehicles();
     //await this.getHistocalData();
@@ -104,6 +106,23 @@ class RegisterView extends React.Component {
     vehicleFactory.setProvider(this.state.web3.currentProvider);
     const vehicleFactoryInstance = await vehicleFactory.deployed();
     await this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
+
+    var filter = this.state.web3.eth.filter('pending');
+      filter.watch(async(error, log) => {
+        console.log("error", error);
+        console.log("log", log);
+
+        let _numberPlate = "";//this.state.vehicle.numberPlate + "dd";
+        let _brand = "";
+        let _model = "";
+        let _color = "";
+
+        console.log("getVehiclesFilteredWithContains", await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
+          _numberPlate, 
+          _brand, _model,
+          _color
+        ));
+    });
 
     let _numberPlate = "";//this.state.vehicle.numberPlate + "dd";
     let _brand = "";
@@ -146,10 +165,10 @@ class RegisterView extends React.Component {
       /*this.setState({ 
         operation: {
           status: "onValidation",
-          message: "Este vehículo ya está registrado."
+          message: "La placa del vehículo ya está registrada."
         }
       });*/
-      console.log("Este vehículo ya está registrado.");
+      console.log("La placa del vehículo ya está registrada.");
       return false;
     }
 
@@ -158,10 +177,10 @@ class RegisterView extends React.Component {
       /*this.setState({ 
         operation: {
           status: "onValidation",
-          message: "Este número de serie ya está registrado."
+          message: "El número de serie ya está registrado."
         }
       });*/
-      console.log("Este número de serie ya está registrado.");
+      console.log("El número de serie ya está registrado.");
       return false;
     }
 
@@ -170,10 +189,10 @@ class RegisterView extends React.Component {
       /*this.setState({ 
         operation: {
           status: "onValidation",
-          message: "Este número de motor ya está registrado."
+          message: "El número de motor ya está registrado."
         }
       });*/
-      console.log("Este número de motor ya está registrado.");
+      console.log("El número de motor ya está registrado.");
       return false;
     }
 
@@ -214,6 +233,26 @@ class RegisterView extends React.Component {
     this.setState(newObject, () =>{ console.log(this.state);} );
   }
 
+  validateVehicleExists = async(_numberPlate) => {
+    const web3 = this.state.web3;
+    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;    
+
+    return await vehicleFactoryInstance.vehicleExists(web3.fromAscii(_numberPlate));
+  }
+
+  validateSerialNumberExists = async(_serialNumber) => {
+    const web3 = this.state.web3;
+    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;    
+
+    return await vehicleFactoryInstance.serialNumberExists(web3.fromAscii(_serialNumber));
+  }
+
+  validateMotorNumberExists = async(_motorNumber) => {
+    const web3 = this.state.web3;
+    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;    
+
+    return await vehicleFactoryInstance.motorNumberExists(web3.fromAscii(_motorNumber));
+  }
 
   handleRegisterVehicle = async() => {
     const web3 = this.state.web3;
@@ -221,7 +260,7 @@ class RegisterView extends React.Component {
 
     if(!accounts || !accounts[0]) {
       console.log("There is no account.");
-      return;
+      return false;
     }
 
     let _numberPlate = this.state.numberPlate;
@@ -233,10 +272,11 @@ class RegisterView extends React.Component {
     let _reason = this.state.reason;
     let _photos = await this.imageToIpfsString(this.state.images);
     let _documents = ["Doc1", "Doc2"];
-    let _ownersId = ["Id1", "Id2"];
-    let _ownersNames = ["Name1", "Name2"];
+    let _owners = this.getOwnersDetail(this.state.owners);
+    let _ownersId = _owners[0];
+    let _ownersNames = _owners[1];
 
-    await this.execRegisterVehicle(
+    return await this.execRegisterVehicle(
       _numberPlate, _brand, _model, 
       _color, _serialNumber, _motorNumber, _reason,
       _photos, _documents, _ownersId, _ownersNames,
@@ -281,16 +321,89 @@ class RegisterView extends React.Component {
     });
   };
 
+  getOwnersDetail = (owners) => {
+    let ownersId = [];
+    let ownersName = [];
+    
+    owners.map(o => {
+      ownersId.push(o.dni);
+      ownersName.push(o.name);
+    });
+    return [ownersId, ownersName];
+  }
 
-  handleNext = () => {
-    if(this.state.activeStep === steps.length - 1 ){
-      this.handleRegisterVehicle();
-    } else {
-      const { activeStep } = this.state;
+
+  handleNext = async() => {
+    const activeStep = this.state.activeStep;
+    let goToNext = false;
+    let message = "";
+    
+    switch(activeStep) {
+      case 0:
+
+        let inputs = [
+          this.state.numberPlate.length,
+          this.state.marca.length,
+          this.state.modelo.length,
+          this.state.color.length,
+          this.state.serialNumber.length,
+          this.state.motorNumber.length,
+          this.state.reason.length
+        ]
+        
+        console.log(inputs);
+
+        let emptyInputs = inputs.filter((i) => {
+          return i === 0;
+        });
+
+        console.log(emptyInputs);
+
+        if(emptyInputs.length > 0) {
+          message = "Los campos son obligatorios.";
+          break;
+        }
+
+        let vehicleExists = await this.validateVehicleExists(this.state.numberPlate);
+        if (vehicleExists) {
+          message = "La placa del vehículo ya está registrada.";
+          break;
+        }
+
+        let serialNumberExists = await this.validateSerialNumberExists(this.state.serialNumber);
+        if (serialNumberExists) {
+          message = "El número de serie ya está registrado.";
+          break;
+        }
+
+        let motorNumberExists = await this.validateMotorNumberExists(this.state.motorNumber);
+        if (motorNumberExists) {
+          message = "El número de motor ya está registrado.";
+          break;
+        }
+
+        goToNext = true;
+        break;
+      case 1:
+        goToNext = true;
+        break;
+      case 2:
+        goToNext = true;
+        break;
+      case 3:
+        goToNext = await this.handleRegisterVehicle();
+        break;
+    }
+
+    if(goToNext) {
       this.setState({
         activeStep: activeStep + 1,
       });
+    } else {
+      console.log(message);
+      alert(message);
     }
+
   };
 
   handleBack = () => {
@@ -330,11 +443,10 @@ class RegisterView extends React.Component {
               {activeStep === steps.length ? (
                 <React.Fragment>
                   <Typography variant="headline" gutterBottom>
-                    Thank you for your order.
+                    Has completado el ingreso de datos 
                   </Typography>
                   <Typography variant="subheading">
-                    Your order number is #2001539. We have emailed your oder confirmation, and will
-                    send you an update when your order has shipped.
+                    En breve, el vehículo será registrado en el sistema.
                   </Typography>
                 </React.Fragment>
               ) : (
