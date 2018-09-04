@@ -10,7 +10,7 @@
     "client": "cd src/client && npm start",
     "server": "nodemon src/server/index.js",
     "setup": "cd src/client && npm install",
-    "contracts": "cd src/smartContracts && truffle migrate"
+    "contracts": "cd src/smartContracts && truffle migrate --reset"
   },
   "keywords": [],
   "author": "",
