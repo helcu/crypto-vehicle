@@ -1,7 +1,8 @@
 {
   "name": "crypto-vehicle",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Dapp project",
+  "repository": "https://github.com/helcu/crypto-vehicle",
   "main": "index.js",
   "scripts": {
     "start": "node src/server/index.js",

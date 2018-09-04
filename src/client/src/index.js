@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import Content from './components/Content';
+//import Content from './components/Content';
 import { BrowserRouter} from 'react-router-dom';
 import Main from './App.js' 
 

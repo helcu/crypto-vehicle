@@ -117,11 +117,13 @@ class RegisterView extends React.Component {
         let _model = "";
         let _color = "";
 
-        console.log("getVehiclesFilteredWithContains", await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
+        let vehicles = await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
           _numberPlate, 
           _brand, _model,
           _color
-        ));
+        );
+
+        await this.manageVehiclesDetail(vehicles);
     });
 
     let _numberPlate = "";//this.state.vehicle.numberPlate + "dd";
@@ -129,11 +131,13 @@ class RegisterView extends React.Component {
     let _model = "";
     let _color = "";
 
-    console.log("getVehiclesFilteredWithContains", await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
+    let vehicles = await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
       _numberPlate, 
       _brand, _model,
       _color
-    ));
+    );
+
+    await this.manageVehiclesDetail(vehicles);
   }
 
    getStepContent(step) {
@@ -149,6 +153,15 @@ class RegisterView extends React.Component {
       default:
         throw new Error('Unknown step');
     }
+  }
+
+  execGetVehicleDetail = async(_numberPlate) => {
+    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
+
+    let vehicle = await vehicleFactoryInstance.getVehicle(_numberPlate);
+    let vehicleDetail = await vehicleFactoryInstance.getVehicleDetail(_numberPlate);
+    vehicle.push(...vehicleDetail);
+    return vehicle;
   }
 
   execRegisterVehicle = async(
@@ -226,7 +239,7 @@ class RegisterView extends React.Component {
 
     return wasVehicleAdded;
   }
-/*-------------------------- HANDLERS ------------------------------------*/ 
+  /*-------------------------- HANDLERS ------------------------------------*/ 
 
   updateStates = (newObject) => {
     console.log(newObject);
@@ -270,7 +283,7 @@ class RegisterView extends React.Component {
     let _serialNumber = this.state.serialNumber;
     let _motorNumber = this.state.motorNumber;
     let _reason = this.state.reason;
-    let _photos = await this.imageToIpfsString(this.state.images);
+    let _photos = await this.imageToIpfsString(this.state.images).catch(e => console.log(e));
     let _documents = ["Doc1", "Doc2"];
     let _owners = this.getOwnersDetail(this.state.owners);
     let _ownersId = _owners[0];
@@ -328,8 +341,25 @@ class RegisterView extends React.Component {
     owners.map(o => {
       ownersId.push(o.dni);
       ownersName.push(o.name);
+      return o;
     });
     return [ownersId, ownersName];
+  }
+
+  manageVehiclesDetail = async(vehicles) => {
+    let promises = [];
+
+    try {
+      vehicles.map((e) => {
+        return promises.push(this.execGetVehicleDetail(e));
+      });
+  
+      const vehiclesDetail = await Promise.all(promises);
+      console.log(vehiclesDetail);
+      //this.setState({ vehiclesDetail: vehiclesDetail });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
 
@@ -392,6 +422,9 @@ class RegisterView extends React.Component {
         break;
       case 3:
         goToNext = await this.handleRegisterVehicle();
+        console.log(goToNext);
+        break;
+      default:
         break;
     }
 
@@ -403,7 +436,6 @@ class RegisterView extends React.Component {
       console.log(message);
       alert(message);
     }
-
   };
 
   handleBack = () => {

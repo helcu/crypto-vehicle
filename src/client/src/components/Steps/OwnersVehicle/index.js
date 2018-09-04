@@ -32,7 +32,7 @@ const styles = theme => ({
 });
 
 let id = 0;
-var rows = [];
+//var rows = [];
 
 class OwnersVehicle extends React.Component {
 
