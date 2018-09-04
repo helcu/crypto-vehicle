@@ -61,7 +61,7 @@ class ImagesVehicle extends React.Component {
   onDeletePhoto = (photoPreview) => {
     let images = this.state.images;
     images = images.filter((image) => {
-      return image.preview!=photoPreview
+      return image.preview !== photoPreview
     });
     this.setState({images: images}, () => {
       this.props.update(this.state);
@@ -86,13 +86,15 @@ class ImagesVehicle extends React.Component {
         <ReactDropzone
           accept="image/*"
           onDrop={this.onPreviewDrop}
-          style={{position: 'relative',
+          style={{
+            position: 'relative',
             width:700,
             height: 200,
-            'border-width': 2,
-            'border-color': 'rgb(70,130,180)',
-            'border-style': 'dashed',
-            'border-radius': 5,}}
+            borderWidth: 2,
+            borderColor: 'rgb(70,130,180)',
+            borderStyle: 'dashed',
+            borderRadius: 5
+          }}
         >
           <Grid container direction="column" justify="center" alignItems="center">
             Arrastrar fotos aquí...

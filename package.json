@@ -1,7 +1,8 @@
 {
   "name": "crypto-vehicle",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Dapp project",
+  "repository": "https://github.com/helcu/crypto-vehicle",
   "main": "index.js",
   "scripts": {
     "start": "node src/server/index.js",
@@ -9,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "cd src/client && npm start",
     "server": "nodemon src/server/index.js",
-    "setup": "cd src/client && npm install",
+    "setup": "npm install && cd src/client && npm install",
     "contracts": "cd src/smartContracts && truffle migrate --reset"
   },
   "keywords": [],
