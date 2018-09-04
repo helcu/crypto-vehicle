@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "cd src/client && npm start",
     "server": "nodemon src/server/index.js",
-    "setup": "cd src/client && npm install",
+    "setup": "npm install && cd src/client && npm install",
     "contracts": "cd src/smartContracts && truffle migrate --reset"
   },
   "keywords": [],
