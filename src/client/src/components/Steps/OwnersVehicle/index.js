@@ -11,6 +11,8 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 
 const styles = theme => ({
@@ -137,7 +139,9 @@ class OwnersVehicle extends React.Component {
                   {row.dni}
                 </TableCell>
                 <TableCell >{row.name}</TableCell>      
-                <TableCell >Botones</TableCell>         
+                <TableCell ><IconButton className={classes.button} aria-label="Delete">
+        <DeleteIcon />
+      </IconButton></TableCell>         
               </TableRow>
             );
           })}
