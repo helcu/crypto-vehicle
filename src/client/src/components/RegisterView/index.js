@@ -371,42 +371,34 @@ class RegisterView extends React.Component {
     switch(activeStep) {
       case 0:
 
-        let inputs = [
-          this.state.numberPlate.length,
-          this.state.marca.length,
-          this.state.modelo.length,
-          this.state.color.length,
-          this.state.serialNumber.length,
-          this.state.motorNumber.length,
-          this.state.reason.length
-        ]
-        
-        console.log(inputs);
-
-        let emptyInputs = inputs.filter((i) => {
-          return i === 0;
-        });
-
-        console.log(emptyInputs);
-
-        if(emptyInputs.length > 0) {
+        const inputs = this.state.inputs;
+        if(!inputs) {
           message = "Los campos son obligatorios.";
           break;
         }
 
-        let vehicleExists = await this.validateVehicleExists(this.state.numberPlate);
+        const invalidInputs = Object.entries(inputs.errors).filter((e) => {
+          return e[1] === true;
+        });
+
+        if(invalidInputs.length > 0) {
+          message = "Algunos campos no cumplen con el formato."
+          break;
+        }
+
+        const vehicleExists = await this.validateVehicleExists(this.state.numberPlate);
         if (vehicleExists) {
           message = "La placa del vehículo ya está registrada.";
           break;
         }
 
-        let serialNumberExists = await this.validateSerialNumberExists(this.state.serialNumber);
+        const serialNumberExists = await this.validateSerialNumberExists(this.state.serialNumber);
         if (serialNumberExists) {
           message = "El número de serie ya está registrado.";
           break;
         }
 
-        let motorNumberExists = await this.validateMotorNumberExists(this.state.motorNumber);
+        const motorNumberExists = await this.validateMotorNumberExists(this.state.motorNumber);
         if (motorNumberExists) {
           message = "El número de motor ya está registrado.";
           break;
@@ -422,7 +414,6 @@ class RegisterView extends React.Component {
         break;
       case 3:
         goToNext = await this.handleRegisterVehicle();
-        console.log(goToNext);
         break;
       default:
         break;
@@ -433,7 +424,6 @@ class RegisterView extends React.Component {
         activeStep: activeStep + 1,
       });
     } else {
-      console.log(message);
       alert(message);
     }
   };

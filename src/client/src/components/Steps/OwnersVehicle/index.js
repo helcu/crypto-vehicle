@@ -65,16 +65,30 @@ class OwnersVehicle extends React.Component {
   }
 
   addButton(){
+    const dni = this.state.dni;
+    const name = this.state.name;
+
+    if(dni.length===0 || name.length===0){
+      alert("Ambos campos son obligatorios.");
+      return;
+    }
+
     const addobj = this.createData(this.state.dni, this.state.name);
     this.addRow(addobj);
     this.setState({name: "", dni:""});
   }
 
-  handleChange = name => event => {
+  handleInputChange = (name, pattern) => event => {
+    var regPattern = new RegExp(pattern);
+    var hasPattern = regPattern.test(event.target.value);
+
+    if(hasPattern) {
       this.setState({
         [name]: event.target.value,
       });
-    };
+    } 
+  };
+
 
   render() {
     const { classes } = this.props;
@@ -92,12 +106,10 @@ class OwnersVehicle extends React.Component {
             name="dni"
             label="DNI"
             fullWidth
-            type="number"
             value={this.state.dni}
-            inputProps={{ 
-              maxLength: 31
-            }}
-            onChange={this.handleChange('dni')}
+            inputProps={{ maxLength: 8 }}
+            helperText="(max. 8)"
+            onChange={this.handleInputChange('dni', "^[0-9]{0,8}$")}
           />
         </Grid>
            
@@ -108,10 +120,10 @@ class OwnersVehicle extends React.Component {
             label="Nombre"
             fullWidth
             value={this.state.name}
-            inputProps={{ 
-              maxLength: 31
-            }}
-            onChange={this.handleChange('name')}
+            inputProps={{ maxLength: 31 }}
+            helperText="(max. 31)"
+            onChange={this.handleInputChange('name', "^[a-zA-Z ]{0,31}$")}
+            onBlur={() => alert("quesito")}
           />
         </Grid>
 

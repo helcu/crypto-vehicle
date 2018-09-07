@@ -5,28 +5,95 @@ import TextField from '@material-ui/core/TextField';
 //import FormControlLabel from '@material-ui/core/FormControlLabel';
 //import Checkbox from '@material-ui/core/Checkbox';
 
+const defaultMessages = {
+  numberPlate: 'e.g., AB-1234 o ABC-123',
+  marca: 'máx. 31',
+  modelo: 'máx. 31',
+  color: 'máx. 31',
+  serialNumber: 'e.g., KZN1854028170',
+  motorNumber: 'e.g., 1KZ0600558',
+  reason: 'máx. 31'
+};
+
+const messages = {
+  success: 'Cumple',
+  error: 'No cumple el formato.'
+};
+
+
 class VehicleInfo extends React.Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
 
     this.state = {
       numberPlate: props.numberPlate,
-      marca:props.marca,
+      marca: props.marca,
       modelo: props.modelo,
-      color:props.color,
-      serialNumber:props.serialNumber,
-      motorNumber:props.motorNumber,
-      reason:props.reason,
+      color: props.color,
+      serialNumber: props.serialNumber,
+      motorNumber: props.motorNumber,
+      reason: props.reason,
+      inputs: {
+        messages: defaultMessages,
+        errors: {
+          numberPlate: false,
+          marca: false,
+          modelo: false,
+          color: false,
+          serialNumber: false,
+          motorNumber: false,
+          reason: false
+        }
+      }
     }
   }
   
-  onUpdate = name => e => {
-    console.log(name);
-    console.log(e.target.value);
-    this.setState({[name]: e.target.value},() =>{ this.props.update(this.state); })
-    console.log(this.state);
+  onUpdate = (pattern) => e => {
+    const name = e.target.name;
+    const value = e.target.value.toUpperCase();
+    const regPattern = new RegExp(pattern);
+    const hasPattern = regPattern.test(value);
+
+    if(hasPattern) {
+      this.setState({
+        [name]: value,
+        inputs: {
+          messages: {
+            ...this.state.inputs.messages,
+            [name]: defaultMessages[name]
+          },
+          errors: {
+            ...this.state.inputs.errors,
+            [name]: !hasPattern
+          }
+        }
+      },() => { 
+        this.props.update(this.state);
+      });
+    }
   }
+
+  onBlur = (pattern) => e => {
+    const name = e.target.name;
+    const value = e.target.value.toUpperCase().trim();
+    const regPattern = new RegExp(pattern);
+    const hasPattern = regPattern.test(value);
+
+    this.setState({
+      inputs: {
+        messages: {
+          ...this.state.inputs.messages,
+          [name]: hasPattern ? messages.success : messages.error + " " + defaultMessages[name]
+        },
+        errors: {
+          ...this.state.inputs.errors,
+          [name]: !hasPattern
+        }
+      }
+    });
+  };
+  
   
   render(){
   return (
@@ -36,7 +103,6 @@ class VehicleInfo extends React.Component {
       </Typography>
      
       <Grid container spacing={24}>
-       
         <Grid item xs={12}>
           <TextField
             id="numberPlate"
@@ -45,9 +111,10 @@ class VehicleInfo extends React.Component {
             required
             fullWidth
             value = {this.state.numberPlate}
-            inputProps={{ maxLength: 7 }}
-            autoComplete="billing address-line2"
-            onChange={this.onUpdate('numberPlate')}
+            helperText={this.state.inputs.messages.numberPlate}
+            error={this.state.inputs.errors.numberPlate}
+            onChange={this.onUpdate("^(([A-Z]{0,3})|([A-Z]{0,2}[-]{1}[0-9]{0,4})|([A-Z]{0,3}[-]{1}[0-9]{0,3}))$")}
+            onBlur={this.onBlur("^(([A-Z]{2}[-]{1}[0-9]{4})|([A-Z]{3}[-]{1}[0-9]{3}))$")}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -58,9 +125,10 @@ class VehicleInfo extends React.Component {
             required
             fullWidth
             value = {this.state.marca}
-            inputProps={{ maxLength: 31 }}
-            autoComplete="billing address-line2"
-            onChange={this.onUpdate('marca')}
+            helperText={this.state.inputs.messages.marca}
+            error={this.state.inputs.errors.marca}
+            onChange={this.onUpdate("^([A-Z0-9 ]{0,31})$")}
+            onBlur={this.onBlur("^([A-Z0-9 ]{1,31})$")}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -71,9 +139,10 @@ class VehicleInfo extends React.Component {
             required
             fullWidth
             value = {this.state.modelo}
-            inputProps={{ maxLength: 31 }}
-            autoComplete="billing address-line2"
-            onChange={this.onUpdate('modelo')}
+            helperText={this.state.inputs.messages.modelo}
+            error={this.state.inputs.errors.modelo}
+            onChange={this.onUpdate("^([A-Z0-9 ]{0,31})$")}
+            onBlur={this.onBlur("^([A-Z0-9 ]{1,31})$")}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -84,12 +153,12 @@ class VehicleInfo extends React.Component {
             required
             fullWidth
             value = {this.state.color}
-            inputProps={{ maxLength: 31 }}
-            autoComplete="billing address-line2"
-            onChange={this.onUpdate('color')}
+            helperText={this.state.inputs.messages.color}
+            error={this.state.inputs.errors.color}
+            onChange={this.onUpdate("^([A-Z0-9 ]{0,31})$")}
+            onBlur={this.onBlur("^([A-Z0-9 ]{1,31})$")}
           />
         </Grid>
-
         <Grid item xs={12} sm={6}>
           <TextField
             id="serialNumber"
@@ -98,12 +167,12 @@ class VehicleInfo extends React.Component {
             required
             fullWidth
             value = {this.state.serialNumber}
-            inputProps={{ maxLength: 13 }}
-            autoComplete="billing address-line2"
-            onChange={this.onUpdate('serialNumber')}
+            helperText={this.state.inputs.messages.serialNumber}
+            error={this.state.inputs.errors.serialNumber}
+            onChange={this.onUpdate("^([A-Z0-9]{0,17})$")}
+            onBlur={this.onBlur("^([A-Z0-9]{13,17})$")}
           />
         </Grid>
-
         <Grid item xs={12} sm={6}>
           <TextField
             id="motorNumber"
@@ -112,12 +181,12 @@ class VehicleInfo extends React.Component {
             required
             fullWidth
             value = {this.state.motorNumber}
-            inputProps={{ maxLength: 10 }}
-            autoComplete="billing address-line2"
-            onChange={this.onUpdate('motorNumber')}
+            helperText={this.state.inputs.messages.motorNumber}
+            error={this.state.inputs.errors.motorNumber}
+            onChange={this.onUpdate("^([A-Z0-9]{0,10})$")}
+            onBlur={this.onBlur("^([A-Z0-9]{10})$")}
           />
         </Grid>
-
         <Grid item xs={12} sm={6}>
           <TextField
             id="reason"
@@ -126,16 +195,13 @@ class VehicleInfo extends React.Component {
             required
             fullWidth
             value = {this.state.reason}
-            inputProps={{ 
-              maxLength: 31
-            }}
-            autoComplete="billing address-line2"
-            onChange={this.onUpdate('reason')}
+            helperText={this.state.inputs.messages.reason}
+            error={this.state.inputs.errors.reason}
+            onChange={this.onUpdate("^([A-Z0-9 ]{0,31})$")}
+            onBlur={this.onBlur("^([A-Z0-9 ]{1,31})$")}
           />
         </Grid>
-        
       </Grid>
-
     </React.Fragment>
   );}
 }
