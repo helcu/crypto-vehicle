@@ -9,7 +9,7 @@ import SearchIcon from '@material-ui/icons/Search';
 //import BarChartIcon from '@material-ui/icons/BarChart';
 //import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export const mainListItems = (
   <div>
@@ -19,23 +19,23 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Inicio" />
     </ListItem>
-<Link to='/page2' style={{ textDecoration: 'none' }} replace={true} >
-    <ListItem button>
-      <ListItemIcon>
-        <SearchIcon />
-      </ListItemIcon>
-      <ListItemText primary="Consulta Vehicular" />
-    </ListItem>
-</Link>
-<Link to='/register' style={{ textDecoration: 'none' }} replace={true} >
-    <ListItem button>
-      <ListItemIcon>
-        <CommuteIcon />
-      </ListItemIcon>
-      <ListItemText primary="Registro Vehicular" />
-    </ListItem>
-</Link>
-  
+    <Link to='/page2' style={{ textDecoration: 'none' }} replace={true} >
+      <ListItem button>
+        <ListItemIcon>
+          <SearchIcon />
+        </ListItemIcon>
+        <ListItemText primary="Consulta Vehicular" />
+      </ListItem>
+    </Link>
+    <Link to='/register' style={{ textDecoration: 'none' }} replace={true} >
+      <ListItem button>
+        <ListItemIcon>
+          <CommuteIcon />
+        </ListItemIcon>
+        <ListItemText primary="Registro Vehicular" />
+      </ListItem>
+    </Link>
+
   </div>
 );
 

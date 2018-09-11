@@ -6,7 +6,9 @@ import TextField from '@material-ui/core/TextField';
 //import Checkbox from '@material-ui/core/Checkbox';
 
 const defaultMessages = {
-  numberPlate: 'e.g., AB-1234 o ABC-123',
+  success: 'Cumple',
+  error: 'No cumple el formato.',
+  numberPlate: 'e.g., AB-1234 o A1C-234',
   marca: 'máx. 31',
   modelo: 'máx. 31',
   color: 'máx. 31',
@@ -15,9 +17,25 @@ const defaultMessages = {
   reason: 'máx. 31'
 };
 
-const messages = {
-  success: 'Cumple',
-  error: 'No cumple el formato.'
+const inputsPattern = {
+  onChange: {
+    numberPlate: /^(([A-Z0-9]{0,3})|([A-Z0-9]{0,2}[-]{1}[0-9]{0,4})|([A-Z0-9]{0,3}[-]{1}[0-9]{0,3}))$/,
+    marca: /^([A-Z0-9 ]{0,31})$/,
+    modelo: /^([A-Z0-9 ]{0,31})$/,
+    color: /^([A-Z0-9 ]{0,31})$/,
+    serialNumber: /^([A-Z0-9]{0,17})$/,
+    motorNumber: /^([A-Z0-9]{0,10})$/,
+    reason: /^([A-Z0-9 ]{0,31})$/,
+  },
+  onBlur: {
+    numberPlate: /^(([A-Z0-9]{2}[-]{1}[0-9]{4})|([A-Z0-9]{3}[-]{1}[0-9]{3}))$/,
+    marca: /^([A-Z0-9 ]{1,31})$/,
+    modelo: /^([A-Z0-9 ]{1,31})$/,
+    color: /^([A-Z0-9 ]{1,31})$/,
+    serialNumber: /^([A-Z0-9]{13,17})$/,
+    motorNumber: /^([A-Z0-9]{10})$/,
+    reason: /^([A-Z0-9 ]{1,31})$/,
+  }
 };
 
 
@@ -48,14 +66,14 @@ class VehicleInfo extends React.Component {
       }
     }
   }
-  
-  onUpdate = (pattern) => e => {
+
+  onChange = () => e => {
     const name = e.target.name;
-    const value = e.target.value.toUpperCase();
-    const regPattern = new RegExp(pattern);
+    const value = e.target.value.toUpperCase().replace(/\s\s+/g, ' ');
+    const regPattern = new RegExp(inputsPattern.onChange[name]);
     const hasPattern = regPattern.test(value);
 
-    if(hasPattern) {
+    if (hasPattern) {
       this.setState({
         [name]: value,
         inputs: {
@@ -68,23 +86,24 @@ class VehicleInfo extends React.Component {
             [name]: !hasPattern
           }
         }
-      },() => { 
+      }, () => {
         this.props.update(this.state);
       });
     }
   }
 
-  onBlur = (pattern) => e => {
+  onBlur = () => e => {
     const name = e.target.name;
     const value = e.target.value.toUpperCase().trim();
-    const regPattern = new RegExp(pattern);
+    const regPattern = new RegExp(inputsPattern.onBlur[name]);
     const hasPattern = regPattern.test(value);
 
     this.setState({
+      [name]: value,
       inputs: {
         messages: {
           ...this.state.inputs.messages,
-          [name]: hasPattern ? messages.success : messages.error + " " + defaultMessages[name]
+          [name]: hasPattern ? defaultMessages.success : defaultMessages.error + " " + defaultMessages[name]
         },
         errors: {
           ...this.state.inputs.errors,
@@ -93,117 +112,145 @@ class VehicleInfo extends React.Component {
       }
     });
   };
-  
-  
-  render(){
-  return (
-    <React.Fragment>
-      <Typography variant="title" gutterBottom>
-        Datos
-      </Typography>
-     
-      <Grid container spacing={24}>
-        <Grid item xs={12}>
-          <TextField
-            id="numberPlate"
-            name="numberPlate"
-            label="Número de placa"
-            required
-            fullWidth
-            value = {this.state.numberPlate}
-            helperText={this.state.inputs.messages.numberPlate}
-            error={this.state.inputs.errors.numberPlate}
-            onChange={this.onUpdate("^(([A-Z]{0,3})|([A-Z]{0,2}[-]{1}[0-9]{0,4})|([A-Z]{0,3}[-]{1}[0-9]{0,3}))$")}
-            onBlur={this.onBlur("^(([A-Z]{2}[-]{1}[0-9]{4})|([A-Z]{3}[-]{1}[0-9]{3}))$")}
-          />
+
+  validateInputs = async () => {
+
+    const invalidInputs = Object.entries(inputsPattern.onBlur).map((e) => {
+      const name = e[0];
+      const value = this.state[name].toUpperCase().trim();
+      const regPattern = new RegExp(inputsPattern.onBlur[name]);
+      const hasPattern = regPattern.test(value);
+      return [
+        [name],
+        hasPattern ? defaultMessages.success : defaultMessages.error + " " + defaultMessages[name],
+        !hasPattern
+      ];
+    });
+
+    var messages = Object.assign(...invalidInputs.map(d => ({ [d[0]]: d[1] })));
+    var errors = Object.assign(...invalidInputs.map(d => ({ [d[0]]: d[2] })));
+
+    this.setState({
+      inputs: {
+        messages: messages,
+        errors: errors
+      }
+    }, () => {
+      this.props.update(this.state);
+    });
+  };
+
+
+  render() {
+    return (
+      <React.Fragment>
+        <Typography variant="title" gutterBottom>
+          Datos
+        </Typography>
+
+        <Grid container spacing={24}>
+          <Grid item xs={12}>
+            <TextField
+              id="numberPlate"
+              name="numberPlate"
+              label="Número de placa"
+              required
+              fullWidth
+              autoComplete="off"
+              value={this.state.numberPlate}
+              helperText={this.state.inputs.messages.numberPlate}
+              error={this.state.inputs.errors.numberPlate}
+              onChange={this.onChange()}
+              onBlur={this.onBlur()} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="marca"
+              name="marca"
+              label="Marca"
+              required
+              fullWidth
+              autoComplete="off"
+              value={this.state.marca}
+              helperText={this.state.inputs.messages.marca}
+              error={this.state.inputs.errors.marca}
+              onChange={this.onChange()}
+              onBlur={this.onBlur()} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="modelo"
+              name="modelo"
+              label="Modelo"
+              required
+              fullWidth
+              autoComplete="off"
+              value={this.state.modelo}
+              helperText={this.state.inputs.messages.modelo}
+              error={this.state.inputs.errors.modelo}
+              onChange={this.onChange()}
+              onBlur={this.onBlur()} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="color"
+              name="color"
+              label="Color"
+              required
+              fullWidth
+              autoComplete="off"
+              value={this.state.color}
+              helperText={this.state.inputs.messages.color}
+              error={this.state.inputs.errors.color}
+              onChange={this.onChange()}
+              onBlur={this.onBlur()} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="serialNumber"
+              name="serialNumber"
+              label="Número de Serie"
+              required
+              fullWidth
+              autoComplete="off"
+              value={this.state.serialNumber}
+              helperText={this.state.inputs.messages.serialNumber}
+              error={this.state.inputs.errors.serialNumber}
+              onChange={this.onChange()}
+              onBlur={this.onBlur()} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="motorNumber"
+              name="motorNumber"
+              label="Número de Motor"
+              required
+              fullWidth
+              autoComplete="off"
+              value={this.state.motorNumber}
+              helperText={this.state.inputs.messages.motorNumber}
+              error={this.state.inputs.errors.motorNumber}
+              onChange={this.onChange()}
+              onBlur={this.onBlur()} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="reason"
+              name="reason"
+              label="Razón"
+              required
+              fullWidth
+              autoComplete="off"
+              value={this.state.reason}
+              helperText={this.state.inputs.messages.reason}
+              error={this.state.inputs.errors.reason}
+              onChange={this.onChange()}
+              onBlur={this.onBlur()} />
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            id="marca"
-            name="marca"
-            label="Marca"
-            required
-            fullWidth
-            value = {this.state.marca}
-            helperText={this.state.inputs.messages.marca}
-            error={this.state.inputs.errors.marca}
-            onChange={this.onUpdate("^([A-Z0-9 ]{0,31})$")}
-            onBlur={this.onBlur("^([A-Z0-9 ]{1,31})$")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            id="modelo"
-            name="modelo"
-            label="Modelo"
-            required
-            fullWidth
-            value = {this.state.modelo}
-            helperText={this.state.inputs.messages.modelo}
-            error={this.state.inputs.errors.modelo}
-            onChange={this.onUpdate("^([A-Z0-9 ]{0,31})$")}
-            onBlur={this.onBlur("^([A-Z0-9 ]{1,31})$")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            id="color"
-            name="color"
-            label="Color"
-            required
-            fullWidth
-            value = {this.state.color}
-            helperText={this.state.inputs.messages.color}
-            error={this.state.inputs.errors.color}
-            onChange={this.onUpdate("^([A-Z0-9 ]{0,31})$")}
-            onBlur={this.onBlur("^([A-Z0-9 ]{1,31})$")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            id="serialNumber"
-            name="serialNumber"
-            label="Número de Serie"
-            required
-            fullWidth
-            value = {this.state.serialNumber}
-            helperText={this.state.inputs.messages.serialNumber}
-            error={this.state.inputs.errors.serialNumber}
-            onChange={this.onUpdate("^([A-Z0-9]{0,17})$")}
-            onBlur={this.onBlur("^([A-Z0-9]{13,17})$")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            id="motorNumber"
-            name="motorNumber"
-            label="Número de Motor"
-            required
-            fullWidth
-            value = {this.state.motorNumber}
-            helperText={this.state.inputs.messages.motorNumber}
-            error={this.state.inputs.errors.motorNumber}
-            onChange={this.onUpdate("^([A-Z0-9]{0,10})$")}
-            onBlur={this.onBlur("^([A-Z0-9]{10})$")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            id="reason"
-            name="reason"
-            label="Razón"
-            required
-            fullWidth
-            value = {this.state.reason}
-            helperText={this.state.inputs.messages.reason}
-            error={this.state.inputs.errors.reason}
-            onChange={this.onUpdate("^([A-Z0-9 ]{0,31})$")}
-            onBlur={this.onBlur("^([A-Z0-9 ]{1,31})$")}
-          />
-        </Grid>
-      </Grid>
-    </React.Fragment>
-  );}
+      </React.Fragment>
+    );
+  }
 }
 
 export default VehicleInfo;
