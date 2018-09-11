@@ -84,7 +84,7 @@ class ImagesVehicle extends React.Component {
       <div className="app">
       <Grid container direction="row" justify="center" alignItems="center">
         <ReactDropzone
-          accept="image/*"
+          accept="image/jpeg"
           onDrop={this.onPreviewDrop}
           style={{
             position: 'relative',

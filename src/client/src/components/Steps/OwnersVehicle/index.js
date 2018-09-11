@@ -27,124 +27,157 @@ const styles = theme => ({
     fontSize: 20,
   },
   table: {
-      minWidth: 700,
+    minWidth: 700,
   },
 });
 
 let id = 0;
-//var rows = [];
+const inputsPattern = {
+  onChange: {
+    dni: /^[0-9]{0,8}$/,
+    name: /^[a-zA-Z ]{0,31}$/
+  },
+  onBlur: {
+    dni: /^[0-9]{8}$/,
+    name: /^[a-zA-Z ]{1,31}$/
+  }
+};
 
 class OwnersVehicle extends React.Component {
 
-  constructor(props){
+  constructor(props) {
 
     super(props);
 
     this.state = {
-      owners : props.owners,
-      dni : "",
-      name : ""
+      owners: props.owners,
+      dni: "",
+      name: ""
     };
 
     this.createData = this.createData.bind(this);
     this.addRow = this.addRow.bind(this);
     this.addButton = this.addButton.bind(this);
-   };
+  };
 
 
   createData(dni, name) {
     console.log(dni + name);
     id += 1;
-    return { id, dni, name};
+    return { id, dni, name };
   }
 
-  addRow(newItem){
-    this.setState({owners: [...this.state.owners,newItem ]}, () =>{ this.props.update(this.state)});
+  addRow(newItem) {
+    this.setState({ owners: [...this.state.owners, newItem] }, () => { this.props.update(this.state) });
   }
 
-  addButton(){
+  addButton() {
+    if (this.state.dni === "" || this.state.name === "") {
+      alert("Los campos son obligatorios.");
+      return;
+    }
+
+    const value = this.state.dni;
+    const regPattern = new RegExp(inputsPattern.onBlur["dni"]);
+    const hasPattern = regPattern.test(value);
+
+    if (!hasPattern) {
+      alert("El DNI no cumple con el formato.");
+      return;
+    }
+
     const addobj = this.createData(this.state.dni, this.state.name);
     this.addRow(addobj);
-    this.setState({name: "", dni:""});
+    this.setState({ name: "", dni: "" });
   }
 
-  handleChange = name => event => {
+  handleChange = () => e => {
+    const name = e.target.name;
+    const value = e.target.value.replace(/\s\s+/g, ' ');
+    const regPattern = new RegExp(inputsPattern.onChange[name]);
+    const hasPattern = regPattern.test(value);
+
+    console.log(name, value, regPattern, hasPattern);
+
+    if (hasPattern) {
       this.setState({
-        [name]: event.target.value,
+        [name]: value
+      }, () => {
+        this.props.update(this.state);
       });
-    };
+    }
+  };
 
   render() {
     const { classes } = this.props;
 
     return (
-    <React.Fragment>
-      <Typography variant="title" gutterBottom>
-        Propietarios
+      <React.Fragment>
+        <Typography variant="title" gutterBottom>
+          Propietarios
       </Typography>
 
-      <Grid container spacing={24}>    
-        <Grid item xs={12} sm={6}>
-          <TextField
-            id="dni"
-            name="dni"
-            label="DNI"
-            fullWidth
-            type="number"
-            value={this.state.dni}
-            inputProps={{ 
-              maxLength: 31
-            }}
-            onChange={this.handleChange('dni')}
-          />
-        </Grid>
-           
-        <Grid item xs={12} sm={6}  >
-          <TextField
-            id="nameOwner"
-            name="nameOwner"
-            label="Nombre"
-            fullWidth
-            value={this.state.name}
-            inputProps={{ 
-              maxLength: 31
-            }}
-            onChange={this.handleChange('name')}
-          />
-        </Grid>
+        <Grid container spacing={24}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="dni"
+              name="dni"
+              label="DNI"
+              fullWidth
+              value={this.state.dni}
+              inputProps={{
+                maxLength: 31
+              }}
+              onChange={this.handleChange('dni')}
+            />
+          </Grid>
 
-        <Grid container xs={12} direction="row"  justify="flex-end" alignItems="center" >
-          <Button variant="contained" color="primary" className={classes.button} onClick = {this.addButton} >
-            Agregar
+          <Grid item xs={12} sm={6}  >
+            <TextField
+              id="name"
+              name="name"
+              label="Nombre"
+              fullWidth
+              value={this.state.name}
+              inputProps={{
+                maxLength: 31
+              }}
+              onChange={this.handleChange('name')}
+            />
+          </Grid>
+
+          <Grid container xs={12} direction="row" justify="flex-end" alignItems="center" >
+            <Button variant="contained" color="primary" className={classes.button} onClick={this.addButton} >
+              Agregar
             <AddIcon className={classes.rightIcon} />
-          </Button>
-        </Grid>      
-      </Grid>
+            </Button>
+          </Grid>
+        </Grid>
 
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>DNI</TableCell>
-            <TableCell>Nombre</TableCell>
-            <TableCell>Opciones</TableCell>         
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {this.state.owners.map(row => {
-            return (
-              <TableRow key={row.id}>
-                <TableCell component="th" scope="row">
-                  {row.dni}
-                </TableCell>
-                <TableCell >{row.name}</TableCell>      
-                <TableCell >Botones</TableCell>         
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </React.Fragment>
-  );
+        <Table className={classes.table}>
+          <TableHead>
+            <TableRow>
+              <TableCell>DNI</TableCell>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Opciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {this.state.owners.map(row => {
+              return (
+                <TableRow key={row.id}>
+                  <TableCell component="th" scope="row">
+                    {row.dni}
+                  </TableCell>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </React.Fragment>
+    );
   }
 }
 
