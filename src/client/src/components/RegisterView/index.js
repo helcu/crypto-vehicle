@@ -62,7 +62,7 @@ const steps = ['Datos', 'Fotos', 'Documentos', 'Propietarios'];
 class RegisterView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
+    this.state = {
       activeStep: 0,
       numberPlate: '',
       marca: '',
@@ -77,6 +77,7 @@ class RegisterView extends React.Component {
       web3: null,
       vehicleFactoryInstance: null
     };
+    this.vehicleInfoChild = React.createRef();
   }
 
   elementsToHex = (_asciiArray) => {
@@ -85,22 +86,22 @@ class RegisterView extends React.Component {
     });
   }
 
-  componentDidMount = async() => {
+  componentDidMount = async () => {
     let results = await getWeb3
-    .catch(() => {
-      console.log('Error finding web3.')
-    });
+      .catch(() => {
+        console.log('Error finding web3.')
+      });
 
     await this.setState({ web3: results.web3 }, () => {
       this.initContracts();
     });
-    
-    
+
+
     //await this.manageVehicles();
     //await this.getHistocalData();
   }
 
-  initContracts = async() => {
+  initContracts = async () => {
     const contract = require('truffle-contract');
     const vehicleFactory = contract(VehicleFactoryContract);
     vehicleFactory.setProvider(this.state.web3.currentProvider);
@@ -108,22 +109,22 @@ class RegisterView extends React.Component {
     await this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
 
     var filter = this.state.web3.eth.filter('pending');
-      filter.watch(async(error, log) => {
-        console.log("error", error);
-        console.log("log", log);
+    filter.watch(async (error, log) => {
+      console.log("error", error);
+      console.log("log", log);
 
-        let _numberPlate = "";//this.state.vehicle.numberPlate + "dd";
-        let _brand = "";
-        let _model = "";
-        let _color = "";
+      let _numberPlate = "";//this.state.vehicle.numberPlate + "dd";
+      let _brand = "";
+      let _model = "";
+      let _color = "";
 
-        let vehicles = await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
-          _numberPlate, 
-          _brand, _model,
-          _color
-        );
+      let vehicles = await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
+        _numberPlate,
+        _brand, _model,
+        _color
+      );
 
-        await this.manageVehiclesDetail(vehicles);
+      await this.manageVehiclesDetail(vehicles);
     });
 
     let _numberPlate = "";//this.state.vehicle.numberPlate + "dd";
@@ -132,7 +133,7 @@ class RegisterView extends React.Component {
     let _color = "";
 
     let vehicles = await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
-      _numberPlate, 
+      _numberPlate,
       _brand, _model,
       _color
     );
@@ -140,14 +141,14 @@ class RegisterView extends React.Component {
     await this.manageVehiclesDetail(vehicles);
   }
 
-   getStepContent(step) {
+  getStepContent(step) {
     switch (step) {
       case 0:
-        return <VehicleInfo {...this.state} update={this.updateStates}  />;
+        return <VehicleInfo ref={this.vehicleInfoChild} {...this.state} update={this.updateStates} />;
       case 1:
-        return <ImagesVehicle {...this.state} update={this.updateStates}/>;
+        return <ImagesVehicle {...this.state} update={this.updateStates} />;
       case 2:
-        return <DocumentsVehicle {...this.state} update={this.updateStates}/>;
+        return <DocumentsVehicle {...this.state} update={this.updateStates} />;
       case 3:
         return <OwnersVehicle {...this.state} update={this.updateStates} />;
       default:
@@ -155,7 +156,7 @@ class RegisterView extends React.Component {
     }
   }
 
-  execGetVehicleDetail = async(_numberPlate) => {
+  execGetVehicleDetail = async (_numberPlate) => {
     const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
 
     let vehicle = await vehicleFactoryInstance.getVehicle(_numberPlate);
@@ -164,17 +165,17 @@ class RegisterView extends React.Component {
     return vehicle;
   }
 
-  execRegisterVehicle = async(
-    _numberPlate, _brand, _model, 
+  execRegisterVehicle = async (
+    _numberPlate, _brand, _model,
     _color, _serialNumber, _motorNumber, _reason,
     _photos, _documents, _ownersId, _ownersNames,
     _userAddress
   ) => {
     const web3 = this.state.web3;
-    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;    
+    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
 
     let exists = await vehicleFactoryInstance.vehicleExists(web3.fromAscii(_numberPlate));
-    if(exists) {
+    if (exists) {
       /*this.setState({ 
         operation: {
           status: "onValidation",
@@ -186,7 +187,7 @@ class RegisterView extends React.Component {
     }
 
     exists = await vehicleFactoryInstance.serialNumberExists(web3.fromAscii(_serialNumber));
-    if(exists) {
+    if (exists) {
       /*this.setState({ 
         operation: {
           status: "onValidation",
@@ -198,7 +199,7 @@ class RegisterView extends React.Component {
     }
 
     exists = await vehicleFactoryInstance.motorNumberExists(web3.fromAscii(_motorNumber));
-    if(exists) {
+    if (exists) {
       /*this.setState({ 
         operation: {
           status: "onValidation",
@@ -218,7 +219,7 @@ class RegisterView extends React.Component {
       web3.fromAscii(_numberPlate), web3.fromAscii(_brand), web3.fromAscii(_model),
       web3.fromAscii(_color), web3.fromAscii(_serialNumber), web3.fromAscii(_motorNumber), web3.fromAscii(_reason),
       _photos, _documents, _ownersId, _ownersNames,
-        {from: _userAddress}
+      { from: _userAddress }
     );
 
     /*if(wasVehicleAdded) {
@@ -239,39 +240,39 @@ class RegisterView extends React.Component {
 
     return wasVehicleAdded;
   }
-  /*-------------------------- HANDLERS ------------------------------------*/ 
+  /*-------------------------- HANDLERS ------------------------------------*/
 
   updateStates = (newObject) => {
     console.log(newObject);
-    this.setState(newObject, () =>{ console.log(this.state);} );
+    this.setState(newObject, () => { console.log(this.state); });
   }
 
-  validateVehicleExists = async(_numberPlate) => {
+  validateVehicleExists = async (_numberPlate) => {
     const web3 = this.state.web3;
-    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;    
+    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
 
     return await vehicleFactoryInstance.vehicleExists(web3.fromAscii(_numberPlate));
   }
 
-  validateSerialNumberExists = async(_serialNumber) => {
+  validateSerialNumberExists = async (_serialNumber) => {
     const web3 = this.state.web3;
-    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;    
+    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
 
     return await vehicleFactoryInstance.serialNumberExists(web3.fromAscii(_serialNumber));
   }
 
-  validateMotorNumberExists = async(_motorNumber) => {
+  validateMotorNumberExists = async (_motorNumber) => {
     const web3 = this.state.web3;
-    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;    
+    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
 
     return await vehicleFactoryInstance.motorNumberExists(web3.fromAscii(_motorNumber));
   }
 
-  handleRegisterVehicle = async() => {
+  handleRegisterVehicle = async () => {
     const web3 = this.state.web3;
     const accounts = await web3.eth.accounts;
-    
-    if(!accounts || !accounts[0]) {
+
+    if (!accounts || !accounts[0]) {
       console.log("There is no account.");
       return false;
     }
@@ -290,24 +291,24 @@ class RegisterView extends React.Component {
     let _ownersNames = _owners[1];
 
     return await this.execRegisterVehicle(
-      _numberPlate, _brand, _model, 
+      _numberPlate, _brand, _model,
       _color, _serialNumber, _motorNumber, _reason,
       _photos, _documents, _ownersId, _ownersNames,
       accounts[0]
     );
   }
-  
-  imageToIpfsString = async(images) => {
+
+  imageToIpfsString = async (images) => {
     let promises = [];
     let ipfsArray = "";
 
     try {
-      images.map(async(file) => {
+      images.map(async (file) => {
         promises.push(this.getIpfsString(file));
       });
 
       ipfsArray = await Promise.all(promises);
-    } catch(e) {
+    } catch (e) {
       console.warn(e.message);
     }
 
@@ -316,14 +317,14 @@ class RegisterView extends React.Component {
 
   getIpfsString = (file) => {
     const reader = new FileReader();
-  
+
     return new Promise((resolve, reject) => {
       reader.onerror = () => {
         reader.abort();
         reject(new DOMException("Problem parsing input file."));
       };
-  
-      reader.onload = async() => {
+
+      reader.onload = async () => {
         const fileAsBinaryString = reader.result;
         let buffer = new Buffer(fileAsBinaryString, "binary");
         let ipfsResponse = await ipfs.add(buffer);
@@ -337,7 +338,7 @@ class RegisterView extends React.Component {
   getOwnersDetail = (owners) => {
     let ownersId = [];
     let ownersName = [];
-    
+
     owners.map(o => {
       ownersId.push(o.dni);
       ownersName.push(o.name);
@@ -346,14 +347,14 @@ class RegisterView extends React.Component {
     return [ownersId, ownersName];
   }
 
-  manageVehiclesDetail = async(vehicles) => {
+  manageVehiclesDetail = async (vehicles) => {
     let promises = [];
 
     try {
       vehicles.map((e) => {
         return promises.push(this.execGetVehicleDetail(e));
       });
-  
+
       const vehiclesDetail = await Promise.all(promises);
       console.log(vehiclesDetail);
       //this.setState({ vehiclesDetail: vehiclesDetail });
@@ -363,50 +364,44 @@ class RegisterView extends React.Component {
   }
 
 
-  handleNext = async() => {
-    const activeStep = this.state.activeStep;
+  handleNext = async () => {
+    const activeStep = 2;//this.state.activeStep;
     let goToNext = false;
     let message = "";
-    
-    switch(activeStep) {
+
+    switch (activeStep) {
       case 0:
 
-        let inputs = [
-          this.state.numberPlate.length,
-          this.state.marca.length,
-          this.state.modelo.length,
-          this.state.color.length,
-          this.state.serialNumber.length,
-          this.state.motorNumber.length,
-          this.state.reason.length
-        ]
-        
-        console.log(inputs);
-
-        let emptyInputs = inputs.filter((i) => {
-          return i === 0;
-        });
-
-        console.log(emptyInputs);
-
-        if(emptyInputs.length > 0) {
+        const inputs = this.state.inputs;
+        if (!inputs) {
           message = "Los campos son obligatorios.";
           break;
         }
 
-        let vehicleExists = await this.validateVehicleExists(this.state.numberPlate);
+        await this.vehicleInfoChild.current.validateInputs();
+
+        const invalidInputs = Object.entries(inputs.errors).filter((e) => {
+          return e[1] === true;
+        });
+
+        if (invalidInputs.length > 0) {
+          message = "Algunos campos no cumplen con el formato."
+          break;
+        }
+
+        const vehicleExists = await this.validateVehicleExists(this.state.numberPlate);
         if (vehicleExists) {
           message = "La placa del vehículo ya está registrada.";
           break;
         }
 
-        let serialNumberExists = await this.validateSerialNumberExists(this.state.serialNumber);
+        const serialNumberExists = await this.validateSerialNumberExists(this.state.serialNumber);
         if (serialNumberExists) {
           message = "El número de serie ya está registrado.";
           break;
         }
 
-        let motorNumberExists = await this.validateMotorNumberExists(this.state.motorNumber);
+        const motorNumberExists = await this.validateMotorNumberExists(this.state.motorNumber);
         if (motorNumberExists) {
           message = "El número de motor ya está registrado.";
           break;
@@ -422,18 +417,16 @@ class RegisterView extends React.Component {
         break;
       case 3:
         goToNext = await this.handleRegisterVehicle();
-        console.log(goToNext);
         break;
       default:
         break;
     }
 
-    if(goToNext) {
+    if (goToNext) {
       this.setState({
         activeStep: activeStep + 1,
       });
     } else {
-      console.log(message);
       alert(message);
     }
   };
@@ -454,15 +447,12 @@ class RegisterView extends React.Component {
   render() {
     const { classes } = this.props;
     const { activeStep } = this.state;
-    
-    return (
-    <div>
-      <CssBaseline />
-      <Typography variant="display3" gutterBottom>
-        Registro vehicular
-      </Typography>
 
-      <main className={classes.layout}>
+    return (
+      <div>
+        <CssBaseline />
+
+        <main className={classes.layout}>
           <Paper className={classes.paper}>
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map(label => (
@@ -475,37 +465,46 @@ class RegisterView extends React.Component {
               {activeStep === steps.length ? (
                 <React.Fragment>
                   <Typography variant="headline" gutterBottom>
-                    Has completado el ingreso de datos 
+                    Has completado el ingreso de datos
                   </Typography>
                   <Typography variant="subheading">
                     En breve, el vehículo será registrado en el sistema.
                   </Typography>
                 </React.Fragment>
               ) : (
-                <React.Fragment>
-                  {this.getStepContent(activeStep)}
-                  <div className={classes.buttons}>
-                    {activeStep !== 0 && (
-                      <Button onClick={this.handleBack} className={classes.button}>
-                        Regresar
+                  <React.Fragment>
+                    {this.getStepContent(activeStep)}
+                    <div className={classes.buttons}>
+                      {
+                        activeStep !== 0 &&
+                        (
+                          <Button onClick={this.handleBack} className={classes.button}>
+                            Regresar
+                          </Button>
+                        )
+                      }
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={this.handleNext}
+                        className={classes.button}>
+                        {activeStep === steps.length - 1 ? 'Terminar' : 'Siguiente'}
                       </Button>
-                    )}
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={this.handleNext}
-                      className={classes.button}
-                    >
-                      {activeStep === steps.length - 1 ? 'Terminar' : 'Siguiente'}
-                    </Button>
-                  </div>
-                </React.Fragment>
-              )}
+                    </div>
+                  </React.Fragment>
+                )}
             </React.Fragment>
           </Paper>
+<<<<<<< HEAD
         </main>   
     </div>
   );}
+=======
+        </main>
+      </div>
+    );
+  }
+>>>>>>> f71e4f7302efee44f8174fecabae1a0f5fe7a474
 }
 
 RegisterView.propTypes = {

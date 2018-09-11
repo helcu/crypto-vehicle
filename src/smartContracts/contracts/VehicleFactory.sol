@@ -111,6 +111,20 @@ contract VehicleFactory is Authorizable {
         );
     }
 
+    function getVehicleFiltered
+    (
+        bytes32 _numberPlate
+    )
+    public view returns 
+    (
+        bytes32, bytes32, bytes32, string
+    ) {
+        Vehicle storage vehicle = vehicles[_numberPlate];
+        return (
+            vehicle.numberPlate, vehicle.brand, vehicle.model, vehicle.photos
+        );
+    }
+
     function vehicleExists
     (
         bytes32 _numberPlate

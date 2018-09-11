@@ -7,7 +7,6 @@ import Grid from '@material-ui/core/Grid';
 import ReactDropzone from 'react-dropzone';
 //import ReactDOM from 'react-dom';
 //import  '../../../../node_modules/react-dropzone-component/styles/filepicker.css'
-import ipfs from './../../../utils/ipfs';
 
 
 class ImagesVehicle extends React.Component {
@@ -23,39 +22,11 @@ class ImagesVehicle extends React.Component {
   };
   
   onPreviewDrop = (images) => {
-    
     this.setState({
       images: this.state.images.concat(images)
     }, () => {
       this.props.update(this.state);
     });
-
-    images.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileAsBinaryString = reader.result;
-        this.convertToBuffer(fileAsBinaryString);
-      };
-      reader.onabort = () => console.log('file reading was aborted');
-      reader.onerror = () => console.log('file reading has failed');
-      //reader.readAsBinaryString(file);
-    });
-  }
-
-  convertToBuffer = async(blob) => {
-    let buffer = new Buffer(blob, "binary");
-
-    await ipfs.add(buffer, (err, ipfsHash) => {
-      console.log(err, ipfsHash);
-
-      /*let photos;
-      console.log(photos);
-      if(this.state.vehicle.photos === "") {
-        photos = ipfsHash[0].hash;
-      } else {
-        photos = this.state.vehicle.photos + "," + ipfsHash[0].hash;
-      }*/
-    })
   }
 
   onDeletePhoto = (photoPreview) => {
@@ -84,7 +55,7 @@ class ImagesVehicle extends React.Component {
       <div className="app">
       <Grid container direction="row" justify="center" alignItems="center">
         <ReactDropzone
-          accept="image/*"
+          accept="image/png,image/jpeg"
           onDrop={this.onPreviewDrop}
           style={{
             position: 'relative',

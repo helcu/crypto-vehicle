@@ -7,7 +7,10 @@ import Grid from '@material-ui/core/Grid';
 import ReactDropzone from 'react-dropzone';
 //import ReactDOM from 'react-dom';
 //import  '../../../../node_modules/react-dropzone-component/styles/filepicker.css'
+<<<<<<< HEAD
 import ipfs from './../../../utils/ipfs';
+=======
+>>>>>>> f71e4f7302efee44f8174fecabae1a0f5fe7a474
 
 
 class DocumentsVehicle extends React.Component {
@@ -23,12 +26,16 @@ class DocumentsVehicle extends React.Component {
   };
   
   onPreviewDrop = (documents) => {
+<<<<<<< HEAD
     
+=======
+>>>>>>> f71e4f7302efee44f8174fecabae1a0f5fe7a474
     this.setState({
       documents: this.state.documents.concat(documents)
     }, () => {
       this.props.update(this.state);
     });
+<<<<<<< HEAD
 
     documents.forEach((file) => {
       const reader = new FileReader();
@@ -56,6 +63,8 @@ class DocumentsVehicle extends React.Component {
         photos = this.state.vehicle.photos + "," + ipfsHash[0].hash;
       }*/
     })
+=======
+>>>>>>> f71e4f7302efee44f8174fecabae1a0f5fe7a474
   }
 
   onDeletePhoto = (photoPreview) => {
@@ -79,12 +88,16 @@ class DocumentsVehicle extends React.Component {
     return (
     <React.Fragment>
       <Typography variant="title" gutterBottom>
-        Documentos
+        Fotos
       </Typography>
       <div className="app">
       <Grid container direction="row" justify="center" alignItems="center">
         <ReactDropzone
+<<<<<<< HEAD
           accept=".pdf"
+=======
+          accept="application/pdf"
+>>>>>>> f71e4f7302efee44f8174fecabae1a0f5fe7a474
           onDrop={this.onPreviewDrop}
           style={{
             position: 'relative',
