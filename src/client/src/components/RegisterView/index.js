@@ -503,8 +503,7 @@ class RegisterView extends React.Component {
               )}
             </React.Fragment>
           </Paper>
-        </main>
-      
+        </main>   
     </div>
   );}
 }

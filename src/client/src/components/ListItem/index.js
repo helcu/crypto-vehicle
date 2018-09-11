@@ -13,13 +13,15 @@ import {Link} from 'react-router-dom';
 
 export const mainListItems = (
   <div>
+  <Link to='/home' style={{ textDecoration: 'none' }} replace={true} >
     <ListItem button>
       <ListItemIcon>
         <DashboardIcon />
       </ListItemIcon>
       <ListItemText primary="Inicio" />
     </ListItem>
-<Link to='/page2' style={{ textDecoration: 'none' }} replace={true} >
+  </Link>
+<Link to='/search' style={{ textDecoration: 'none' }} replace={true} >
     <ListItem button>
       <ListItemIcon>
         <SearchIcon />

@@ -8,7 +8,7 @@ node_modules/
 
 # production
 /build
-
+buildContracts/
 # misc
 .DS_Store
 .env.local

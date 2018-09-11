@@ -18,8 +18,8 @@ import { mainListItems, secondaryListItems } from './components/ListItem';
 
 import {Route, Switch, Redirect} from 'react-router-dom';
 import RegisterView from './components/RegisterView'
-
-
+import SearchView from './components/SearchView'
+import HomeView from './components/HomeView'
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -169,15 +169,15 @@ class Main extends React.Component {
           <Switch>
             <Route
               path="/home"
-              render={() => <p> home </p>} />
+              component={HomeView} />
             <Route
               exact
               path="/register"
               component={RegisterView} />
             <Route
               exact
-              path="/page2"
-              render={() =>  <p>  page 2 </p>} />
+              path="/search"
+              component={SearchView} />
             <Route render={() =>  <p>  error </p>} />
           </Switch>
 
