@@ -73,8 +73,6 @@ const styles = theme => ({
   }
 });
 
-const arrayCard = [{ numerlPlate: 123 }, { numerlPlate: 12554543 }, { numerlPlate: 123346 }, { numerlPlate: 123346 }, { numerlPlate: 123346 },
-{ numerlPlate: 123346 }, { numerlPlate: 123346 }, { numerlPlate: 123346 }]
 
 class SearchView extends React.Component {
 
@@ -82,6 +80,10 @@ class SearchView extends React.Component {
     super(props);
     this.state = {
       input: "",
+      checkNumberPlate: true,
+      checkBrand: true,
+      checkModel: true,
+      checkColor: true,
       vehiclesFiltered: [],
       vehicle: {
         numberPlate: "",
@@ -99,6 +101,7 @@ class SearchView extends React.Component {
       web3: null,
       vehicleFactoryInstance: null
     };
+
   }
 
   componentDidMount = async () => {
@@ -120,7 +123,47 @@ class SearchView extends React.Component {
     await this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
   }
 
-  searchVehicle = () => {
+  execGetVehicleFiltered = async (_numberPlate) => {
+    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
+    return await vehicleFactoryInstance.getVehicleFiltered(_numberPlate);
+  }
+
+  mappingVehiclesFromContract = (vehicles) => {
+    const web3 = this.state.web3;
+    return vehicles.map((v) => {
+      return {
+        numberPlate: web3.toAscii(v[0]),
+        brand: web3.toAscii(v[1]),
+        model: web3.toAscii(v[2]),
+        image: v[3].split(",")[0]
+      }
+    });
+  }
+
+  manageVehiclesFiltered = async (vehicles) => {
+    let promises = [];
+
+    try {
+      vehicles.map((e) => {
+        return promises.push(this.execGetVehicleFiltered(e));
+      });
+
+      const vehiclesFiltered = await Promise.all(promises);
+      console.log(vehiclesFiltered);
+      console.log(this.mappingVehiclesFromContract(vehiclesFiltered));
+
+      this.setState({ vehiclesFiltered: this.mappingVehiclesFromContract(vehiclesFiltered) });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  onChange = () => e => {
+    const value = e.target.value.toUpperCase().replace(/\s\s+/g, ' ');
+    this.setState({ input: value });
+  }
+
+  onSearch = async () => {
     const input = this.state.input;
     let _numberPlate = this.state.checkNumberPlate ? input : "";
     let _brand = this.state.checkBrand ? input : "";
@@ -136,25 +179,10 @@ class SearchView extends React.Component {
     await this.manageVehiclesFiltered(vehicles);
   }
 
-  execGetVehicleFiltered = async (_numberPlate) => {
-    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
-    return await vehicleFactoryInstance.getVehicleFiltered(_numberPlate);
-  }
-
-  manageVehiclesFiltered = async (vehicles) => {
-    let promises = [];
-
-    try {
-      vehicles.map((e) => {
-        return promises.push(this.execGetVehicleFiltered(e));
-      });
-
-      const vehiclesFiltered = await Promise.all(promises);
-      console.log(vehiclesFiltered);
-      this.setState({ vehiclesFiltered: vehiclesFiltered });
-    } catch (e) {
-      console.log(e);
-    }
+  handleChange = () => e => {
+    this.setState({
+      [e.target.name]: e.target.checked
+    });
   }
 
   render() {
@@ -163,7 +191,7 @@ class SearchView extends React.Component {
     return (
       <div>
         <CssBaseline />
-
+        
         <main className={classes.layout}>
           <Paper className={classes.paper}>
             <Grid container item sm={12} alignItems='center'>
@@ -171,6 +199,7 @@ class SearchView extends React.Component {
                 <TextField
                   label="Buscar"
                   id="bootstrap-input"
+                  value={this.state.input}
                   fullWidth
                   style={{ marginLeft: 32 }}
                   InputProps={{
@@ -180,10 +209,11 @@ class SearchView extends React.Component {
                       input: classes.bootstrapInput,
                     },
                   }}
+                  onChange={this.onChange()}
                 />
               </Grid>
               <Grid item xs={12} sm={1}>
-                <Button sm={1} justIcon round color="primary" style={{ marginTop: 29, marginLeft: 10 }} ><Search style={{ color: "#FFFFFF" }} /></Button>
+                <Button sm={1} justIcon round color="primary" style={{ marginTop: 29, marginLeft: 10 }} onClick={this.onSearch} ><Search style={{ color: "#FFFFFF" }} /></Button>
               </Grid>
 
             </Grid>
@@ -193,8 +223,9 @@ class SearchView extends React.Component {
               <FormControlLabel
                 control={
                   <Checkbox
-
+                    checked={this.state.checkNumberPlate} onChange={this.handleChange()}
                     value="checkedA"
+                    name='checkNumberPlate'
                   />
                 }
                 label="Placa"
@@ -203,8 +234,9 @@ class SearchView extends React.Component {
               <FormControlLabel
                 control={
                   <Checkbox
-
+                    checked={this.state.checkBrand} onChange={this.handleChange()}
                     value="checkedA"
+                    name='checkBrand'
                   />
                 }
                 label="Marca"
@@ -212,8 +244,9 @@ class SearchView extends React.Component {
               <FormControlLabel
                 control={
                   <Checkbox
-
+                    checked={this.state.checkModel} onChange={this.handleChange()}
                     value="checkedA"
+                    name='checkModel'
                   />
                 }
                 label="Modelo"
@@ -222,8 +255,9 @@ class SearchView extends React.Component {
               <FormControlLabel
                 control={
                   <Checkbox
-
+                    checked={this.state.checkColor} onChange={this.handleChange()}
                     value="checkedA"
+                    name='checkColor'
                   />
                 }
                 label="Color"
@@ -234,8 +268,8 @@ class SearchView extends React.Component {
 
           <Grid container direction='row' md={12} lg={12} alignItems='baseline' spacing={24} justify='center'>
             {
-              arrayCard.map(cardVehicle => (
-                <ImgMediaCard />
+              this.state.vehiclesFiltered.map(cardVehicle => (
+                <ImgMediaCard numberPlate={cardVehicle.numberPlate} brand={cardVehicle.brand} model={cardVehicle.model} image={cardVehicle.image} />
               ))
             }
           </Grid>
@@ -255,4 +289,3 @@ SearchView.propTypes = {
 };
 
 export default withStyles(styles)(SearchView);
-

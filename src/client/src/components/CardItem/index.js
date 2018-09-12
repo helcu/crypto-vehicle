@@ -34,11 +34,11 @@ const styles = {
   flex: {
     flex: 1,
   },
-  Button:{
-    background:'white',
+  Button: {
+    background: 'white',
     color: 'black',
   },
-  action:{
+  action: {
     maxWidth: 345,
     minWidth: 344,
   },
@@ -57,10 +57,9 @@ class ImgMediaCard extends React.Component {
       numberPlate: props.numberPlate,
       brand: props.brand,
       model: props.model,
-      image: props.image,
+      image: 'https://gateway.ipfs.io/ipfs//' + props.image,
       open: false,
     }
-
   }
 
   handleClickOpen = () => {
@@ -135,13 +134,13 @@ class ImgMediaCard extends React.Component {
               </IconButton>
               <Typography variant="title" color="inherit" className={classes.flex}>
                 Detalle
-    </Typography>
+              </Typography>
               <Button color="inherit" onClick={this.handleClose}>
                 save
-    </Button>
+              </Button>
             </Toolbar>
           </AppBar>
-          <DetailBody/>
+          <DetailBody />
         </Dialog>
       </div>
     );
