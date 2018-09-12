@@ -1,14 +1,8 @@
 import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-//import TextField from '@material-ui/core/TextField';
-//import FormControlLabel from '@material-ui/core/FormControlLabel';
-//import Checkbox from '@material-ui/core/Checkbox';
 import ReactDropzone from 'react-dropzone';
-//import ReactDOM from 'react-dom';
-//import  '../../../../node_modules/react-dropzone-component/styles/filepicker.css'
 
-import ipfs from './../../../utils/ipfs';
 
 class DocumentsVehicle extends React.Component {
 

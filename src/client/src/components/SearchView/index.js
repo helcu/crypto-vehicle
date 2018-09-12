@@ -1,13 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
@@ -128,6 +124,15 @@ class SearchView extends React.Component {
     return await vehicleFactoryInstance.getVehicleFiltered(_numberPlate);
   }
 
+  execGetVehicleDetail = async (_numberPlate) => {
+    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
+
+    let vehicle = await vehicleFactoryInstance.getVehicle(_numberPlate);
+    let vehicleDetail = await vehicleFactoryInstance.getVehicleDetail(_numberPlate);
+    vehicle.push(...vehicleDetail);
+    return vehicle;
+  }
+
   mappingVehiclesFromContract = (vehicles) => {
     const web3 = this.state.web3;
     return vehicles.map((v) => {
@@ -140,22 +145,51 @@ class SearchView extends React.Component {
     });
   }
 
+  mappingOwnersFromContract = (ownersIds, ownersNames) => {
+    const web3 = this.state.web3;
+    ownersIds.map((o, i) => {
+      return {
+        dni: web3.toAscii(o),
+        name: web3.toAscii(ownersNames[i])
+      };
+    });
+  }
+
+  mappingVehicleDetailFromContract = (vehicle) => {
+    const web3 = this.state.web3;
+    const owners = this.mappingOwnersFromContract(vehicle[9], vehicle[10]);
+
+    return {
+      numberPlate: web3.toAscii(vehicle[0]),
+      brand: web3.toAscii(vehicle[1]),
+      model: web3.toAscii(vehicle[2]),
+      color: web3.toAscii(vehicle[3]),
+      serialNumber: web3.toAscii(vehicle[4]),
+      motorNumber: web3.toAscii(vehicle[5]),
+      reason: web3.toAscii(vehicle[6]),
+      photos: vehicle[7].split(","),
+      documents: vehicle[8].split(","),
+      owners: owners,
+      employeeAddress: vehicle[11]
+    };
+  }
+
   manageVehiclesFiltered = async (vehicles) => {
     let promises = [];
 
-    try {
-      vehicles.map((e) => {
-        return promises.push(this.execGetVehicleFiltered(e));
-      });
+    vehicles.map((e) => {
+      return promises.push(this.execGetVehicleFiltered(e));
+    });
 
-      const vehiclesFiltered = await Promise.all(promises);
-      console.log(vehiclesFiltered);
-      console.log(this.mappingVehiclesFromContract(vehiclesFiltered));
+    const vehiclesFiltered = await Promise.all(promises);
+    const vehiclesMapped = this.mappingVehiclesFromContract(vehiclesFiltered);
+    this.setState({ vehiclesFiltered: vehiclesMapped });
+  }
 
-      this.setState({ vehiclesFiltered: this.mappingVehiclesFromContract(vehiclesFiltered) });
-    } catch (e) {
-      console.log(e);
-    }
+  manageVehicleDetail = async (_numberPlate) => {
+    const vehicle = await this.execGetVehicleDetail(_numberPlate);
+    const vehicleMapped = this.mappingVehicleDetailFromContract(vehicle);
+    //this.setState(vehicle <= vehicleMapped);
   }
 
   onChange = () => e => {
@@ -191,7 +225,7 @@ class SearchView extends React.Component {
     return (
       <div>
         <CssBaseline />
-        
+
         <main className={classes.layout}>
           <Paper className={classes.paper}>
             <Grid container item sm={12} alignItems='center'>
