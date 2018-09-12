@@ -264,15 +264,6 @@ contract VehicleFactory is Authorizable {
         return true;
     }
 
-
-    function contains
-    (
-        string word, string filter
-    )
-    public pure returns (bool) {
-        return Strings.contains(Strings.toSlice(word), Strings.toSlice(filter));
-    }
-
     function getVehiclesFilteredWithContains
     (
         string _numberPlate, 
@@ -290,10 +281,10 @@ contract VehicleFactory is Authorizable {
             string memory model = bytes32ToString(vehicles[vehiclesNumberPlate[i]].model);
             string memory color = bytes32ToString(vehicles[vehiclesNumberPlate[i]].color);
 
-            if( contains(numberPlate, _numberPlate) ||
-                contains(brand, _brand) ||
-                contains(model, _model) ||
-                contains(color, _color)) {
+            if(!isEmpty(_numberPlate) && contains(numberPlate, _numberPlate) ||
+                !isEmpty(_brand) && contains(brand, _brand) ||
+                !isEmpty(_model) && contains(model, _model) ||
+                !isEmpty(_color) && contains(color, _color)) {
                 vehiclesFiltered[i] = vehiclesNumberPlate[i];
                 count++;
             }
@@ -327,5 +318,21 @@ contract VehicleFactory is Authorizable {
             bytesStringTrimmed[j] = bytesString[j];
         }
         return string(bytesStringTrimmed);
+    }
+
+    function contains
+    (
+        string word, string filter
+    )
+    public pure returns (bool) {
+        return Strings.contains(Strings.toSlice(word), Strings.toSlice(filter));
+    }
+
+    function isEmpty
+    (
+        string word
+    )
+    public pure returns (bool) {
+        return Strings.empty(Strings.toSlice(word));
     }
 }
