@@ -15,12 +15,15 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Dialog from '@material-ui/core/Dialog';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
+import DetailBody from '../DetailBody'
 
 const styles = {
   card: {
     maxWidth: 345,
-    marginTop: 32,
+    minWidth: 344,
+    marginBottom: 32,
     marginLeft: 32,
+    boxShadow: '0 3px 5px 2px rgba(64, 64, 64, .3)',
   },
   media: {
     objectFit: 'cover',
@@ -30,6 +33,14 @@ const styles = {
   },
   flex: {
     flex: 1,
+  },
+  Button:{
+    background:'white',
+    color: 'black',
+  },
+  action:{
+    maxWidth: 345,
+    minWidth: 344,
   },
 };
 
@@ -43,9 +54,10 @@ class ImgMediaCard extends React.Component {
     super(props);
 
     this.state = {
-      numberPlate: 'BEAT-DRDREE',
-      brand: 'Tesla',
-      model: 'model 3',
+      numberPlate: props.numberPlate,
+      brand: props.brand,
+      model: props.model,
+      image: props.image,
       open: false,
     }
 
@@ -66,12 +78,12 @@ class ImgMediaCard extends React.Component {
     return (
       <div>
         <Card className={classes.card}>
-          <CardActionArea>
+          <CardActionArea className={classes.action}>
             <CardMedia
               component="img"
               className={classes.media}
               height="140"
-              image={'https://gateway.ipfs.io/ipfs/QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm'}
+              image={this.state.image}
               title="Contemplative Reptile"
             />
             <CardContent>
@@ -103,8 +115,8 @@ class ImgMediaCard extends React.Component {
               direction="row"
               justify="flex-end"
               alignItems="center">
-              <Button size="small" color="primary" onClick={this.handleClickOpen}>
-                Detale
+              <Button size="small" color="primary" onClick={this.handleClickOpen} className={classes.Button} >
+                Detalle
         </Button>
             </Grid>
           </CardActions>
@@ -122,14 +134,14 @@ class ImgMediaCard extends React.Component {
                 <CloseIcon />
               </IconButton>
               <Typography variant="title" color="inherit" className={classes.flex}>
-                Sound
+                Detalle
     </Typography>
               <Button color="inherit" onClick={this.handleClose}>
                 save
     </Button>
             </Toolbar>
           </AppBar>
-
+          <DetailBody/>
         </Dialog>
       </div>
     );

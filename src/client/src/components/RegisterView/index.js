@@ -446,7 +446,7 @@ class RegisterView extends React.Component {
 
     return (
       <div>
-        <CssBaseline />
+        <CssBaseline/>
 
         <main className={classes.layout}>
           <Paper className={classes.paper}>

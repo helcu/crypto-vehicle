@@ -8,6 +8,7 @@ import ReactDropzone from 'react-dropzone';
 //import ReactDOM from 'react-dom';
 //import  '../../../../node_modules/react-dropzone-component/styles/filepicker.css'
 
+import ipfs from './../../../utils/ipfs';
 
 class DocumentsVehicle extends React.Component {
 

@@ -118,30 +118,14 @@ class SearchView extends React.Component {
     vehicleFactory.setProvider(this.state.web3.currentProvider);
     const vehicleFactoryInstance = await vehicleFactory.deployed();
     await this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
+  }
 
-    var filter = this.state.web3.eth.filter('pending');
-    filter.watch(async (error, log) => {
-      console.log("error", error);
-      console.log("log", log);
-
-      let _numberPlate = "";
-      let _brand = "";
-      let _model = "";
-      let _color = "";
-
-      let vehicles = await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
-        _numberPlate,
-        _brand, _model,
-        _color
-      );
-
-      await this.manageVehiclesDetail(vehicles);
-    });
-
-    let _numberPlate = "";
-    let _brand = "";
-    let _model = "";
-    let _color = "";
+  searchVehicle = () => {
+    const input = this.state.input;
+    let _numberPlate = this.state.checkNumberPlate ? input : "";
+    let _brand = this.state.checkBrand ? input : "";
+    let _model = this.state.checkModel ? input : "";
+    let _color = this.state.checkColor ? input : "";
 
     let vehicles = await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
       _numberPlate,
@@ -149,20 +133,25 @@ class SearchView extends React.Component {
       _color
     );
 
-    await this.manageVehiclesDetail(vehicles);
+    await this.manageVehiclesFiltered(vehicles);
   }
 
-  manageVehiclesDetail = async (vehicles) => {
+  execGetVehicleFiltered = async (_numberPlate) => {
+    const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
+    return await vehicleFactoryInstance.getVehicleFiltered(_numberPlate);
+  }
+
+  manageVehiclesFiltered = async (vehicles) => {
     let promises = [];
 
     try {
       vehicles.map((e) => {
-        return promises.push(this.execGetVehicleDetail(e));
+        return promises.push(this.execGetVehicleFiltered(e));
       });
 
-      const vehiclesDetail = await Promise.all(promises);
-      console.log(vehiclesDetail);
-      //this.setState({ vehiclesDetail: vehiclesDetail });
+      const vehiclesFiltered = await Promise.all(promises);
+      console.log(vehiclesFiltered);
+      this.setState({ vehiclesFiltered: vehiclesFiltered });
     } catch (e) {
       console.log(e);
     }
