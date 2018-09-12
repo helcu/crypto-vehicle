@@ -14,6 +14,10 @@ import TextField from '@material-ui/core/TextField';
 import Search from '@material-ui/icons/Search';
 import Button from '../../components-ui/CustomButtons/Button.jsx';
 import ImgMediaCard from '../CardItem'
+import getWeb3 from '../../utils/getWeb3'
+
+import VehicleFactoryContract from './../../buildContracts/VehicleFactory.json'
+
 
 const styles = theme => ({
   bootstrapRoot: {
@@ -69,10 +73,100 @@ const styles = theme => ({
   }
 });
 
-const arrayCard = [{ numerlPlate: 123 }, { numerlPlate: 12554543 }, { numerlPlate: 123346 }, { numerlPlate: 123346 } ,{ numerlPlate: 123346 },
-  { numerlPlate: 123346 } , { numerlPlate: 123346 }, { numerlPlate: 123346 }]
+const arrayCard = [{ numerlPlate: 123 }, { numerlPlate: 12554543 }, { numerlPlate: 123346 }, { numerlPlate: 123346 }, { numerlPlate: 123346 },
+{ numerlPlate: 123346 }, { numerlPlate: 123346 }, { numerlPlate: 123346 }]
 
-class RegisterView extends React.Component {
+class SearchView extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      input: "",
+      vehiclesFiltered: [],
+      vehicle: {
+        numberPlate: "",
+        marca: "",
+        modelo: "",
+        color: "",
+        serialNumber: "",
+        motorNumber: "",
+        reason: "",
+        images: [],
+        documents: [],
+        owners: [],
+        date: ""
+      },
+      web3: null,
+      vehicleFactoryInstance: null
+    };
+  }
+
+  componentDidMount = async () => {
+    let results = await getWeb3
+      .catch(() => {
+        console.log('Error finding web3.')
+      });
+
+    await this.setState({ web3: results.web3 }, () => {
+      this.initContracts();
+    });
+  }
+
+  initContracts = async () => {
+    const contract = require('truffle-contract');
+    const vehicleFactory = contract(VehicleFactoryContract);
+    vehicleFactory.setProvider(this.state.web3.currentProvider);
+    const vehicleFactoryInstance = await vehicleFactory.deployed();
+    await this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
+
+    var filter = this.state.web3.eth.filter('pending');
+    filter.watch(async (error, log) => {
+      console.log("error", error);
+      console.log("log", log);
+
+      let _numberPlate = "";
+      let _brand = "";
+      let _model = "";
+      let _color = "";
+
+      let vehicles = await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
+        _numberPlate,
+        _brand, _model,
+        _color
+      );
+
+      await this.manageVehiclesDetail(vehicles);
+    });
+
+    let _numberPlate = "";
+    let _brand = "";
+    let _model = "";
+    let _color = "";
+
+    let vehicles = await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
+      _numberPlate,
+      _brand, _model,
+      _color
+    );
+
+    await this.manageVehiclesDetail(vehicles);
+  }
+
+  manageVehiclesDetail = async (vehicles) => {
+    let promises = [];
+
+    try {
+      vehicles.map((e) => {
+        return promises.push(this.execGetVehicleDetail(e));
+      });
+
+      const vehiclesDetail = await Promise.all(promises);
+      console.log(vehiclesDetail);
+      //this.setState({ vehiclesDetail: vehiclesDetail });
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   render() {
     const { classes } = this.props;
@@ -80,9 +174,7 @@ class RegisterView extends React.Component {
     return (
       <div>
         <CssBaseline />
-        <Typography variant="display3" gutterBottom>
-          Búsqueda de vehículos
-      </Typography>
+
         <main className={classes.layout}>
           <Paper className={classes.paper}>
             <Grid container item sm={12} alignItems='center'>
@@ -169,9 +261,9 @@ class RegisterView extends React.Component {
 
 }
 
-RegisterView.propTypes = {
+SearchView.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(RegisterView);
+export default withStyles(styles)(SearchView);
 

@@ -7460,19 +7460,10 @@
     "5777": {
       "events": {},
       "links": {},
-<<<<<<< HEAD
-      "address": "0xb877ffda855e4853dfdada4c4033d22e069c1e1c",
-      "transactionHash": "0x4f9f07ce152f4a1c6d7f5f3a3331eb474f1b7433512d69ecaad3e855695cec6b"
+      "address": "0x4777c18ad18079883494a51c73db7545554590e4",
+      "transactionHash": "0x72bea83110d1f4f6ff5ea46c2658be23941cb5c11b1d31040f179d2d96b103e1"
     }
   },
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-09-07T23:38:41.059Z"
-=======
-      "address": "0x2a25996df89480a60735865451512533e51cfeb0",
-      "transactionHash": "0x64cc75040a69ba4965703b27345f42a2f9204542cb75ace2dc7fdcb134084ae6"
-    }
-  },
-  "schemaVersion": "2.0.1",
-  "updatedAt": "2018-09-11T16:32:19.965Z"
->>>>>>> f71e4f7302efee44f8174fecabae1a0f5fe7a474
+  "updatedAt": "2018-09-12T05:35:29.831Z"
 }

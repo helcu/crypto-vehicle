@@ -95,10 +95,6 @@ class RegisterView extends React.Component {
     await this.setState({ web3: results.web3 }, () => {
       this.initContracts();
     });
-
-
-    //await this.manageVehicles();
-    //await this.getHistocalData();
   }
 
   initContracts = async () => {
@@ -113,7 +109,7 @@ class RegisterView extends React.Component {
       console.log("error", error);
       console.log("log", log);
 
-      let _numberPlate = "";//this.state.vehicle.numberPlate + "dd";
+      let _numberPlate = "";
       let _brand = "";
       let _model = "";
       let _color = "";
@@ -127,7 +123,7 @@ class RegisterView extends React.Component {
       await this.manageVehiclesDetail(vehicles);
     });
 
-    let _numberPlate = "";//this.state.vehicle.numberPlate + "dd";
+    let _numberPlate = "";
     let _brand = "";
     let _model = "";
     let _color = "";
@@ -211,7 +207,7 @@ class RegisterView extends React.Component {
     }
 
     //_photos = "QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm";
-    _documents = "QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm";
+    //_documents = "QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm";
     _ownersId = this.elementsToHex(_ownersId);
     _ownersNames = this.elementsToHex(_ownersNames);
 
@@ -285,7 +281,7 @@ class RegisterView extends React.Component {
     let _motorNumber = this.state.motorNumber;
     let _reason = this.state.reason;
     let _photos = await this.imageToIpfsString(this.state.images).catch(e => console.log(e));
-    let _documents = ["Doc1", "Doc2"];
+    let _documents = await this.imageToIpfsString(this.state.documents).catch(e => console.log(e));
     let _owners = this.getOwnersDetail(this.state.owners);
     let _ownersId = _owners[0];
     let _ownersNames = _owners[1];
@@ -365,7 +361,7 @@ class RegisterView extends React.Component {
 
 
   handleNext = async () => {
-    const activeStep = 2;//this.state.activeStep;
+    const activeStep = this.state.activeStep;
     let goToNext = false;
     let message = "";
 
@@ -495,16 +491,10 @@ class RegisterView extends React.Component {
                 )}
             </React.Fragment>
           </Paper>
-<<<<<<< HEAD
-        </main>   
-    </div>
-  );}
-=======
         </main>
       </div>
     );
   }
->>>>>>> f71e4f7302efee44f8174fecabae1a0f5fe7a474
 }
 
 RegisterView.propTypes = {

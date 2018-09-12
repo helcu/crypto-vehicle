@@ -269,7 +269,7 @@ contract VehicleFactory is Authorizable {
     (
         string word, string filter
     )
-    public view returns (bool) {
+    public pure returns (bool) {
         return Strings.contains(Strings.toSlice(word), Strings.toSlice(filter));
     }
 
