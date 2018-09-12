@@ -450,7 +450,7 @@ class RegisterView extends React.Component {
 
     return (
       <div>
-        <CssBaseline />
+        <CssBaseline/>
 
         <main className={classes.layout}>
           <Paper className={classes.paper}>
@@ -495,16 +495,13 @@ class RegisterView extends React.Component {
                 )}
             </React.Fragment>
           </Paper>
-<<<<<<< HEAD
-        </main>   
-    </div>
-  );}
-=======
+
+
         </main>
       </div>
     );
   }
->>>>>>> f71e4f7302efee44f8174fecabae1a0f5fe7a474
+
 }
 
 RegisterView.propTypes = {

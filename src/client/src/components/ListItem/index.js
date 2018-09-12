@@ -13,34 +13,15 @@ import { Link } from 'react-router-dom';
 
 export const mainListItems = (
   <div>
-  <Link to='/home' style={{ textDecoration: 'none' }} replace={true} >
-    <ListItem button>
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Inicio" />
-    </ListItem>
-<<<<<<< HEAD
-  </Link>
-<Link to='/search' style={{ textDecoration: 'none' }} replace={true} >
-    <ListItem button>
-      <ListItemIcon>
-        <SearchIcon />
-      </ListItemIcon>
-      <ListItemText primary="Consulta Vehicular" />
-    </ListItem>
-</Link>
-<Link to='/register' style={{ textDecoration: 'none' }} replace={true} >
-    <ListItem button>
-      <ListItemIcon>
-        <CommuteIcon />
-      </ListItemIcon>
-      <ListItemText primary="Registro Vehicular" />
-    </ListItem>
-</Link>
-  
-=======
-    <Link to='/page2' style={{ textDecoration: 'none' }} replace={true} >
+    <Link to='/home' style={{ textDecoration: 'none' }} replace={true} >
+      <ListItem button>
+        <ListItemIcon>
+          <DashboardIcon />
+        </ListItemIcon>
+        <ListItemText primary="Inicio" />
+      </ListItem>
+    </Link>
+    <Link to='/search' style={{ textDecoration: 'none' }} replace={true} >
       <ListItem button>
         <ListItemIcon>
           <SearchIcon />
@@ -57,7 +38,7 @@ export const mainListItems = (
       </ListItem>
     </Link>
 
->>>>>>> f71e4f7302efee44f8174fecabae1a0f5fe7a474
+
   </div>
 );
 
