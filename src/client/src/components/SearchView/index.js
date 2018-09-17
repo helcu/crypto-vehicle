@@ -184,11 +184,15 @@ class SearchView extends React.Component {
     const vehiclesFiltered = await Promise.all(promises);
     const vehiclesMapped = this.mappingVehiclesFromContract(vehiclesFiltered);
     this.setState({ vehiclesFiltered: vehiclesMapped });
+    vehiclesMapped.map(async (e) => {
+      this.manageVehicleDetail(e.numberPlate);
+    });
   }
 
   manageVehicleDetail = async (_numberPlate) => {
     const vehicle = await this.execGetVehicleDetail(_numberPlate);
     const vehicleMapped = this.mappingVehicleDetailFromContract(vehicle);
+    console.log(vehicleMapped);
     //this.setState(vehicle <= vehicleMapped);
   }
 

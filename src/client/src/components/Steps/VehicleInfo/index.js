@@ -62,10 +62,65 @@ class VehicleInfo extends React.Component {
           serialNumber: false,
           motorNumber: false,
           reason: false
+        },
+        disabled: {
+          numberPlate: false,
+          marca: false,
+          modelo: false
         }
-      }
+      },
+      disabled: false
     }
   }
+
+  /*componentWillReceiveProps(nextProps) {
+    this.forceUpdate();
+    this.setState(
+      ...this.state,
+      nextProps.vehicleData
+    );
+  }*/
+
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (
+      nextProps.marca !== prevState.marca &&
+      nextProps.modelo !== prevState.modelo &&
+      nextProps.color !== prevState.color &&
+      nextProps.serialNumber !== prevState.serialNumber &&
+      nextProps.motorNumber !== prevState.motorNumber &&
+      nextProps.reason !== prevState.reason) {
+      return {
+        numberPlate: nextProps.numberPlate,
+        marca: nextProps.marca,
+        modelo: nextProps.modelo,
+        color: nextProps.color,
+        serialNumber: nextProps.serialNumber,
+        motorNumber: nextProps.motorNumber,
+        reason: nextProps.reason
+      };
+    }
+    else return null;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    //console.log(prevProps, prevState);
+    if (
+      prevProps.marca !== this.state.marca &&
+      prevProps.modelo !== this.state.modelo &&
+      prevProps.color !== this.state.color &&
+      prevProps.serialNumber !== this.state.serialNumber &&
+      prevProps.motorNumber !== this.state.motorNumber &&
+      prevProps.reason !== this.state.reason) {
+      this.setState({
+        ...prevProps,
+        ...this.props
+      }, () => {
+        this.state.update(this.state);
+      });
+    }
+  }
+
 
   onChange = () => e => {
     const name = e.target.name;
@@ -154,11 +209,12 @@ class VehicleInfo extends React.Component {
               id="numberPlate"
               name="numberPlate"
               label="Número de placa"
-              required
+              required={!this.state.disabled}
               fullWidth
               autoComplete="off"
               value={this.state.numberPlate}
-              helperText={this.state.inputs.messages.numberPlate}
+              helperText={this.state.disabled ? "" : this.state.inputs.messages.numberPlate}
+              disabled={this.state.disabled}
               error={this.state.inputs.errors.numberPlate}
               onChange={this.onChange()}
               onBlur={this.onBlur()} />
@@ -168,11 +224,12 @@ class VehicleInfo extends React.Component {
               id="marca"
               name="marca"
               label="Marca"
-              required
+              required={!this.state.disabled}
               fullWidth
               autoComplete="off"
               value={this.state.marca}
-              helperText={this.state.inputs.messages.marca}
+              helperText={this.state.disabled ? "" : this.state.inputs.messages.marca}
+              disabled={this.state.disabled}
               error={this.state.inputs.errors.marca}
               onChange={this.onChange()}
               onBlur={this.onBlur()} />
@@ -182,11 +239,12 @@ class VehicleInfo extends React.Component {
               id="modelo"
               name="modelo"
               label="Modelo"
-              required
+              required={!this.state.disabled}
               fullWidth
               autoComplete="off"
               value={this.state.modelo}
-              helperText={this.state.inputs.messages.modelo}
+              helperText={this.state.disabled ? "" : this.state.inputs.messages.modelo}
+              disabled={this.state.disabled}
               error={this.state.inputs.errors.modelo}
               onChange={this.onChange()}
               onBlur={this.onBlur()} />
