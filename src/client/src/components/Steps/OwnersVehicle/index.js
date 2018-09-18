@@ -71,6 +71,8 @@ class OwnersVehicle extends React.Component {
         }
       }
     };
+
+    id = props.owners.length;
   };
 
 

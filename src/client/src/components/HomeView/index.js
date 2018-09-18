@@ -73,7 +73,7 @@ class HomeView extends React.Component {
         return new Promise((resolve, reject) => {
             var vehicleLogs = [];
             let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
-                { _numberPlate: web3.fromAscii('AWS-321'), _employeeAddress: accounts[0] },
+                { numberPlate: web3.fromAscii('AWS-321'), employeeAddress: accounts[0] },
                 { fromBlock: 0, toBlock: 'latest' }
             );
 
@@ -121,7 +121,7 @@ class HomeView extends React.Component {
         return new Promise((resolve, reject) => {
             var vehicleLogs = [];
             let vehicleUpdatedEvent = this.state.vehicleFactoryInstance.VehicleUpdated(
-                { _numberPlate: web3.fromAscii('AWS-321'), _employeeAddress: accounts[0] },
+                { numberPlate: web3.fromAscii('AWS-321'), employeeAddress: accounts[0] },
                 { fromBlock: 0, toBlock: 'latest' }
             );
 

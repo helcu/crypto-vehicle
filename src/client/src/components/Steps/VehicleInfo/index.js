@@ -62,15 +62,12 @@ class VehicleInfo extends React.Component {
           serialNumber: false,
           motorNumber: false,
           reason: false
-        },
-        disabled: {
-          numberPlate: false,
-          marca: false,
-          modelo: false
         }
       },
       disabled: false
     }
+
+    console.log("VehicleInfo", this.state);
   }
 
   /*componentWillReceiveProps(nextProps) {
@@ -140,7 +137,8 @@ class VehicleInfo extends React.Component {
             ...this.state.inputs.errors,
             [name]: !hasPattern
           }
-        }
+        },
+        disabled: this.props.disabled
       }, () => {
         this.props.update(this.state);
       });
@@ -209,12 +207,12 @@ class VehicleInfo extends React.Component {
               id="numberPlate"
               name="numberPlate"
               label="Número de placa"
-              required={!this.state.disabled}
+              required={!this.props.disabled}
               fullWidth
               autoComplete="off"
               value={this.state.numberPlate}
-              helperText={this.state.disabled ? "" : this.state.inputs.messages.numberPlate}
-              disabled={this.state.disabled}
+              helperText={this.props.disabled ? "" : this.state.inputs.messages.numberPlate}
+              disabled={this.props.disabled}
               error={this.state.inputs.errors.numberPlate}
               onChange={this.onChange()}
               onBlur={this.onBlur()} />
@@ -224,12 +222,12 @@ class VehicleInfo extends React.Component {
               id="marca"
               name="marca"
               label="Marca"
-              required={!this.state.disabled}
+              required={!this.props.disabled}
               fullWidth
               autoComplete="off"
               value={this.state.marca}
-              helperText={this.state.disabled ? "" : this.state.inputs.messages.marca}
-              disabled={this.state.disabled}
+              helperText={this.props.disabled ? "" : this.state.inputs.messages.marca}
+              disabled={this.props.disabled}
               error={this.state.inputs.errors.marca}
               onChange={this.onChange()}
               onBlur={this.onBlur()} />
@@ -239,12 +237,12 @@ class VehicleInfo extends React.Component {
               id="modelo"
               name="modelo"
               label="Modelo"
-              required={!this.state.disabled}
+              required={!this.props.disabled}
               fullWidth
               autoComplete="off"
               value={this.state.modelo}
-              helperText={this.state.disabled ? "" : this.state.inputs.messages.modelo}
-              disabled={this.state.disabled}
+              helperText={this.props.disabled ? "" : this.state.inputs.messages.modelo}
+              disabled={this.props.disabled}
               error={this.state.inputs.errors.modelo}
               onChange={this.onChange()}
               onBlur={this.onBlur()} />

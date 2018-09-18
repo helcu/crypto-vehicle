@@ -12,8 +12,6 @@ class ImagesVehicle extends React.Component {
     this.state = {
       images: this.props.images,
     };
-
-    this.onPreviewDrop = this.onPreviewDrop.bind(this);
   };
 
   onPreviewDrop = (images) => {
@@ -27,7 +25,7 @@ class ImagesVehicle extends React.Component {
   onDelete = (photoPreview) => {
     let images = this.state.images;
     images = images.filter((image) => {
-      return image.preview !== photoPreview
+      return image.preview !== photoPreview && image !== photoPreview;
     });
     this.setState({ images: images }, () => {
       this.props.update(this.state);
@@ -46,7 +44,7 @@ class ImagesVehicle extends React.Component {
       <React.Fragment>
         <Typography variant="title" gutterBottom>
           Fotos
-      </Typography>
+        </Typography>
         <div className="app">
           <Grid container direction="row" justify="center" alignItems="center">
             <ReactDropzone
@@ -68,16 +66,31 @@ class ImagesVehicle extends React.Component {
           </Grid>
           {this.state.images.length > 0 &&
             <React.Fragment>
-              <h3>Vista previa</h3>
-              {this.state.images.map((file) => (
-                <img
-                  alt="Preview"
-                  key={file.preview}
-                  src={file.preview}
-                  style={previewStyle}
-                  onClick={() => this.onDelete(file.preview)}
-                />
-              ))}
+              <Typography variant="subheading" gutterBottom>
+                Vista previa
+              </Typography>
+              {this.state.images.map((file) => {
+                if (file.preview) {
+                  return (
+                    <img
+                      alt="Preview"
+                      key={file.preview}
+                      src={file.preview}
+                      style={previewStyle}
+                      onClick={() => this.onDelete(file.preview)}
+                    />
+                  );
+                } else {
+                  return (
+                    <img
+                      alt="Preview"
+                      key={file}
+                      src={"https://gateway.ipfs.io/ipfs//" + file}
+                      style={previewStyle}
+                      onClick={() => this.onDelete(file)} />
+                  );
+                }
+              })}
             </React.Fragment>
           }
         </div>

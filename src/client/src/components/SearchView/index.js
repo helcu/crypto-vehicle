@@ -147,8 +147,9 @@ class SearchView extends React.Component {
 
   mappingOwnersFromContract = (ownersIds, ownersNames) => {
     const web3 = this.state.web3;
-    ownersIds.map((o, i) => {
+    return ownersIds.map((o, i) => {
       return {
+        id: i,
         dni: web3.toAscii(o),
         name: web3.toAscii(ownersNames[i])
       };

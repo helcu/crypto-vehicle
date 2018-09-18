@@ -209,7 +209,7 @@ class RegisterView extends React.Component {
     }
 
     let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
-      { _numberPlate: web3.fromAscii(_numberPlate), _employeeAddress: accounts[0] },
+      { numberPlate: web3.fromAscii(_numberPlate), employeeAddress: accounts[0] },
       { toBlock: 'latest' }
     );
 
@@ -244,7 +244,12 @@ class RegisterView extends React.Component {
   /*-------------------------- HANDLERS ------------------------------------*/
 
   updateStates = (newObject) => {
-    this.setState(newObject, () => { console.log(this.state); });
+    this.setState({
+      ...newObject,
+      disabled: false
+    }, () => {
+      console.log(this.state);
+    });
   }
 
   validateVehicleExists = async (_numberPlate) => {
@@ -441,12 +446,6 @@ class RegisterView extends React.Component {
     });
   };
 
-  handleReset = () => {
-    this.setState({
-      activeStep: 0,
-    });
-  };
-
   render() {
     const { classes } = this.props;
     const { activeStep } = this.state;
@@ -481,7 +480,11 @@ class RegisterView extends React.Component {
                       {
                         activeStep !== 0 &&
                         (
-                          <Button onClick={this.handleBack} className={classes.button}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={this.handleBack}
+                            className={classes.button}>
                             Regresar
                           </Button>
                         )
