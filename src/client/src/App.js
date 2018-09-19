@@ -164,9 +164,6 @@ class Main extends React.Component {
           <main className={classes.content}>
             <div className={classes.appBarSpacer} />
 
-            <Redirect
-              from="/"
-              to="/home" />
             <Switch>
               <Route
                 path="/home"
@@ -182,10 +179,12 @@ class Main extends React.Component {
               <Route
                 exact
                 path="/update"
-                render={(props) => <UpdateView {...props} numberPlate={'AWS-321'} />}
-                //component={UpdateView} 
-                />
-              <Route render={() => <p>  error </p>} />
+                render={(props) => <UpdateView {...props} numberPlate={'AWS-321'} />} />
+              <Redirect
+                from="/"
+                to="/home" />
+              <Route
+                render={() => <p>  error </p>} />
             </Switch>
 
           </main>
