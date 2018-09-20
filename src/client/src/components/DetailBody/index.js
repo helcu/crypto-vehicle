@@ -17,9 +17,11 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
-import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { Carousel } from 'react-responsive-carousel';
+/*import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Carousel } from 'react-responsive-carousel';*/
 
+import "react-image-gallery/styles/css/image-gallery.css";
+import ImageGallery from 'react-image-gallery';
 
 
 const CustomTableCell = withStyles(theme => ({
@@ -92,7 +94,18 @@ class DetailBody extends React.Component {
             numberMotor: props.vehicle.motorNumber,
             reason: props.vehicle.reason,
             photos: props.vehicle.photos,
-            owners: props.vehicle.owners
+            owners: props.vehicle.owners,
+            
+            images :  props.vehicle.photos != ''? props.vehicle.photos.map((obj) => {
+                return({
+                    original: 'https://gateway.ipfs.io/ipfs//' + obj,
+                    thumbnail:'https://gateway.ipfs.io/ipfs//' + obj,
+                } )
+
+            }) : [{
+                original: require('../Images/car.png'),
+                    thumbnail: require('../Images/car.png'),
+            }]
         }
     }
 
@@ -109,27 +122,10 @@ class DetailBody extends React.Component {
                                     <Typography variant="title" color="inherit">
                                         Detalle
                                      </Typography>
-
                                     <Grid container >
                                         <Grid container xs={6} >
                                             <Grid item xs={12}>
-                                                <Carousel>
-                                                    {this.state.photos != '' ?
-                                                        this.state.photos.map((obj) => {
-                                                            <div>
-                                                                <img src={'https://gateway.ipfs.io/ipfs//' + obj} />
-                                                                <p className="legend">descripcion</p>
-                                                            </div>
-                                                        }) : <div>
-                                                            <img src={require('../Images/car.png')} />
-                                                            <p className="legend">descripcion</p>
-                                                        </div>
-
-                                                    }
-
-
-                                                </Carousel>
-
+                                            <ImageGallery items={this.state.images} />
                                             </Grid>
                                         </Grid>
                                         <Grid container xs={6} >
@@ -279,13 +275,8 @@ class DetailBody extends React.Component {
                     </Grid>
                 </main>
             </div>
-
         )
-
-
     }
-
-
 }
 
 DetailBody.propTypes = {

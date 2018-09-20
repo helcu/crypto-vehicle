@@ -16,10 +16,11 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './components/ListItem';
 
-import {Route, Switch, Redirect} from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import RegisterView from './components/RegisterView'
 import SearchView from './components/SearchView'
 import HomeView from './components/HomeView'
+import UpdateView from './components/UpdateView'
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -131,10 +132,10 @@ class Main extends React.Component {
                 )}
               >
                 <MenuIcon />
-               
+
               </IconButton>
               <Typography variant="title" color="inherit" noWrap className={classes.title}>
-               CryptoVehicle
+                CryptoVehicle
               </Typography>
               <IconButton color="inherit">
                 <Badge badgeContent={4} color="secondary">
@@ -160,26 +161,31 @@ class Main extends React.Component {
             <Divider />
             <List>{secondaryListItems}</List>
           </Drawer>
-          <main className={classes.content}>          
+          <main className={classes.content}>
             <div className={classes.appBarSpacer} />
-            
-            <Redirect
-            from="/"
-            to="/home" />
-          <Switch>
-            <Route
-              path="/home"
-              component={HomeView} />
-            <Route
-              exact
-              path="/register"
-              component={RegisterView} />
-            <Route
-              exact
-              path="/search"
-              component={SearchView} />
-            <Route render={() =>  <p>  error </p>} />
-          </Switch>
+
+            <Switch>
+              <Route
+                path="/home"
+                component={HomeView} />
+              <Route
+                exact
+                path="/register"
+                component={RegisterView} />
+              <Route
+                exact
+                path="/search"
+                component={SearchView} />
+              <Route
+                exact
+                path="/update"
+                render={(props) => <UpdateView {...props} numberPlate={'AWS-321'} />} />
+              <Redirect
+                from="/"
+                to="/home" />
+              <Route
+                render={() => <p>  error </p>} />
+            </Switch>
 
           </main>
         </div>

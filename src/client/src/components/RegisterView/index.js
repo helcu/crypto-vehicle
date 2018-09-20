@@ -86,6 +86,12 @@ class RegisterView extends React.Component {
     });
   }
 
+  elementsToAscii = (_hexArray) => {
+    return _hexArray.map((e) => {
+      return this.state.web3.toAscii(e);
+    });
+  }
+
   componentDidMount = async () => {
     let results = await getWeb3
       .catch(() => {
@@ -103,38 +109,6 @@ class RegisterView extends React.Component {
     vehicleFactory.setProvider(this.state.web3.currentProvider);
     const vehicleFactoryInstance = await vehicleFactory.deployed();
     await this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
-
-    var filter = this.state.web3.eth.filter('pending');
-    filter.watch(async (error, log) => {
-      console.log("error", error);
-      console.log("log", log);
-
-      let _numberPlate = "";
-      let _brand = "";
-      let _model = "";
-      let _color = "";
-
-      let vehicles = await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
-        _numberPlate,
-        _brand, _model,
-        _color
-      );
-
-      await this.manageVehiclesDetail(vehicles);
-    });
-
-    let _numberPlate = "";
-    let _brand = "";
-    let _model = "";
-    let _color = "";
-
-    let vehicles = await this.state.vehicleFactoryInstance.getVehiclesFilteredWithContains(
-      _numberPlate,
-      _brand, _model,
-      _color
-    );
-
-    await this.manageVehiclesDetail(vehicles);
   }
 
   getStepContent(step) {
@@ -172,36 +146,18 @@ class RegisterView extends React.Component {
 
     let exists = await vehicleFactoryInstance.vehicleExists(web3.fromAscii(_numberPlate));
     if (exists) {
-      /*this.setState({ 
-        operation: {
-          status: "onValidation",
-          message: "La placa del vehículo ya está registrada."
-        }
-      });*/
       console.log("La placa del vehículo ya está registrada.");
       return false;
     }
 
     exists = await vehicleFactoryInstance.serialNumberExists(web3.fromAscii(_serialNumber));
     if (exists) {
-      /*this.setState({ 
-        operation: {
-          status: "onValidation",
-          message: "El número de serie ya está registrado."
-        }
-      });*/
       console.log("El número de serie ya está registrado.");
       return false;
     }
 
     exists = await vehicleFactoryInstance.motorNumberExists(web3.fromAscii(_motorNumber));
     if (exists) {
-      /*this.setState({ 
-        operation: {
-          status: "onValidation",
-          message: "El número de motor ya está registrado."
-        }
-      });*/
       console.log("El número de motor ya está registrado.");
       return false;
     }
@@ -211,14 +167,14 @@ class RegisterView extends React.Component {
     _ownersId = this.elementsToHex(_ownersId);
     _ownersNames = this.elementsToHex(_ownersNames);
 
-    let wasVehicleAdded = await vehicleFactoryInstance.registerVehicle(
+    let wasRegistered = await vehicleFactoryInstance.registerVehicle(
       web3.fromAscii(_numberPlate), web3.fromAscii(_brand), web3.fromAscii(_model),
       web3.fromAscii(_color), web3.fromAscii(_serialNumber), web3.fromAscii(_motorNumber), web3.fromAscii(_reason),
       _photos, _documents, _ownersId, _ownersNames,
       { from: _userAddress }
     );
 
-    /*if(wasVehicleAdded) {
+    /*if(wasRegistered) {
       this.setState({ 
         operation: {
           status: "onPending",
@@ -234,34 +190,81 @@ class RegisterView extends React.Component {
       });
     }*/
 
-    return wasVehicleAdded;
+    if (wasRegistered) {
+      this.watchForRegisterLog(_numberPlate);
+    } else {
+      console.log("execRegisterVehicle: failed");
+    }
+
+    return wasRegistered;
+  }
+
+  watchForRegisterLog = async (_numberPlate) => {
+    const web3 = this.state.web3;
+    const accounts = await web3.eth.accounts;
+
+    if (!accounts || !accounts[0]) {
+      console.log("There is no account.");
+      return false;
+    }
+
+    let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
+      { numberPlate: web3.fromAscii(_numberPlate), employeeAddress: accounts[0] },
+      { toBlock: 'latest' }
+    );
+
+    vehicleRegisteredEvent.watch((error, log) => {
+      if (error) {
+        return;
+      }
+
+      const vehicle = log.args;
+      const vehicleLogs = {
+        event: log.event,
+        blockHash: log.blockHash,
+        transactionHash: log.transactionHash,
+        vehicle: {
+          numberPlate: web3.toAscii(vehicle.numberPlate),
+          marca: web3.toAscii(vehicle.brand),
+          modelo: web3.toAscii(vehicle.model),
+          color: web3.toAscii(vehicle.color),
+          serialNumber: web3.toAscii(vehicle.serialNumber),
+          motorNumber: web3.toAscii(vehicle.motorNumber),
+          reason: web3.toAscii(vehicle.reason),
+          photos: vehicle.photos,
+          documents: vehicle.documents,
+          owners: this.getOwnersFromContract(this.elementsToAscii(vehicle.ownersId), this.elementsToAscii(vehicle.ownersNames)),
+          employeeAdress: vehicle.employeeAddress
+        }
+      }
+      console.log("watchForRegisterLog", vehicleLogs);
+      vehicleRegisteredEvent.stopWatching();
+    });
   }
   /*-------------------------- HANDLERS ------------------------------------*/
 
   updateStates = (newObject) => {
-    console.log(newObject);
-    this.setState(newObject, () => { console.log(this.state); });
+    this.setState({
+      ...newObject,
+      disabled: false
+    }, () => {
+      console.log(this.state);
+    });
   }
 
   validateVehicleExists = async (_numberPlate) => {
-    const web3 = this.state.web3;
     const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
-
-    return await vehicleFactoryInstance.vehicleExists(web3.fromAscii(_numberPlate));
+    return await vehicleFactoryInstance.vehicleExists(this.state.web3.fromAscii(_numberPlate));
   }
 
   validateSerialNumberExists = async (_serialNumber) => {
-    const web3 = this.state.web3;
     const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
-
-    return await vehicleFactoryInstance.serialNumberExists(web3.fromAscii(_serialNumber));
+    return await vehicleFactoryInstance.serialNumberExists(this.state.web3.fromAscii(_serialNumber));
   }
 
   validateMotorNumberExists = async (_motorNumber) => {
-    const web3 = this.state.web3;
     const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
-
-    return await vehicleFactoryInstance.motorNumberExists(web3.fromAscii(_motorNumber));
+    return await vehicleFactoryInstance.motorNumberExists(this.state.web3.fromAscii(_motorNumber));
   }
 
   handleRegisterVehicle = async () => {
@@ -341,6 +344,15 @@ class RegisterView extends React.Component {
       return o;
     });
     return [ownersId, ownersName];
+  }
+
+  getOwnersFromContract = (ownersId, ownersName) => {
+    return ownersId.map((e, i) => {
+      return {
+        dni: e,
+        name: ownersName[i]
+      }
+    });
   }
 
   manageVehiclesDetail = async (vehicles) => {
@@ -434,19 +446,13 @@ class RegisterView extends React.Component {
     });
   };
 
-  handleReset = () => {
-    this.setState({
-      activeStep: 0,
-    });
-  };
-
   render() {
     const { classes } = this.props;
     const { activeStep } = this.state;
 
     return (
       <div>
-        <CssBaseline/>
+        <CssBaseline />
 
         <main className={classes.layout}>
           <Paper className={classes.paper}>
@@ -477,7 +483,11 @@ class RegisterView extends React.Component {
                       {
                         activeStep !== 0 &&
                         (
-                          <Button onClick={this.handleBack} className={classes.button}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={this.handleBack}
+                            className={classes.button}>
                             Regresar
                           </Button>
                         )

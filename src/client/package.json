@@ -12,6 +12,7 @@
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-dropzone": "^5.0.1",
+    "react-image-gallery": "^0.8.11",
     "react-lorem-component": "^0.12.2",
     "react-responsive-carousel": "^3.1.42",
     "react-router": "^4.3.1",

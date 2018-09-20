@@ -12,8 +12,6 @@ class DocumentsVehicle extends React.Component {
     this.state = {
       documents: this.props.documents,
     };
-
-    this.onPreviewDrop = this.onPreviewDrop.bind(this);
   };
 
   onPreviewDrop = (documents) => {
@@ -26,8 +24,8 @@ class DocumentsVehicle extends React.Component {
 
   onDelete = (photoPreview) => {
     let documents = this.state.documents;
-    documents = documents.filter((image) => {
-      return image.preview !== photoPreview
+    documents = documents.filter((doc) => {
+      return doc.preview !== photoPreview && doc !== photoPreview;
     });
     this.setState({ documents: documents }, () => {
       this.props.update(this.state);
@@ -68,16 +66,31 @@ class DocumentsVehicle extends React.Component {
           </Grid>
           {this.state.documents.length > 0 &&
             <React.Fragment>
-              <h3>Vista previa</h3>
-              {this.state.documents.map((file) => (
-                <img
-                  alt="Preview"
-                  key={file.preview}
-                  src={file.preview}
-                  style={previewStyle}
-                  onClick={() => this.onDelete(file.preview)}
-                />
-              ))}
+              <Typography variant="subheading" gutterBottom>
+                Vista previa
+              </Typography>
+              {this.state.documents.map((file) => {
+                if (file.preview) {
+                  return (
+                    <img
+                      alt="Preview"
+                      key={file.preview}
+                      src={"https://png.icons8.com/metro/1600/pdf-2.png"}
+                      style={previewStyle}
+                      onClick={() => this.onDelete(file.preview)}
+                    />
+                  );
+                } else {
+                  return (
+                    <img
+                      alt="Preview"
+                      key={file}
+                      src={"https://png.icons8.com/metro/1600/pdf-2.png"}
+                      style={previewStyle}
+                      onClick={() => this.onDelete(file)} />
+                  );
+                }
+              })}
             </React.Fragment>
           }
         </div>

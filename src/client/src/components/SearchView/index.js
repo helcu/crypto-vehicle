@@ -168,8 +168,9 @@ class SearchView extends React.Component {
 
   mappingOwnersFromContract = (ownersIds, ownersNames) => {
     const web3 = this.state.web3;
-    ownersIds.map((o, i) => {
+    return ownersIds.map((o, i) => {
       return {
+        id: i,
         dni: web3.toAscii(o),
         name: web3.toAscii(ownersNames[i])
       };
@@ -205,12 +206,16 @@ class SearchView extends React.Component {
     const vehiclesFiltered = await Promise.all(promises);
     const vehiclesMapped = this.mappingVehiclesFromContract(vehiclesFiltered);
     this.setState({ vehiclesFiltered: vehiclesMapped });
+    vehiclesMapped.map(async (e) => {
+      this.manageVehicleDetail(e.numberPlate);
+    });
   }
 
   manageVehicleDetail = async (_numberPlate) => {
     const vehicle = await this.execGetVehicleDetail(_numberPlate);
     const vehicleMapped = this.mappingVehicleDetailFromContract(vehicle);
     this.setState({vehicle: vehicleMapped});
+
   }
 
   onChange = () => e => {
