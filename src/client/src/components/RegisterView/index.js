@@ -466,6 +466,9 @@ class RegisterView extends React.Component {
                   <Typography variant="subheading">
                     En breve, el vehículo será registrado en el sistema.
                   </Typography>
+                  <div>
+                  <img src={'http://img.hb.aicdn.com/b8a424268462760d5de121b6f00b2825b8da36ca75e7a-krbIE7_fw658'} />
+                  </div>
                 </React.Fragment>
               ) : (
                   <React.Fragment>

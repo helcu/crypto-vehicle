@@ -9,13 +9,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import Slide from '@material-ui/core/Slide';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Dialog from '@material-ui/core/Dialog';
-import CloseIcon from '@material-ui/icons/Close';
-import IconButton from '@material-ui/core/IconButton';
-import DetailBody from '../DetailBody'
+
 
 const styles = {
   card: {
@@ -28,12 +22,7 @@ const styles = {
   media: {
     objectFit: 'cover',
   },
-  appBar: {
-    position: 'relative',
-  },
-  flex: {
-    flex: 1,
-  },
+  
   Button: {
     background: 'white',
     color: 'black',
@@ -44,9 +33,6 @@ const styles = {
   },
 };
 
-function Transition(props) {
-  return <Slide direction="up" {...props} />;
-}
 
 class ImgMediaCard extends React.Component {
 
@@ -57,19 +43,12 @@ class ImgMediaCard extends React.Component {
       numberPlate: props.numberPlate,
       brand: props.brand,
       model: props.model,
-      image: 'https://gateway.ipfs.io/ipfs//' + props.image,
-      open: false,
+      image: props.image == ''? require('../Images/car.png'): 'https://gateway.ipfs.io/ipfs//' + props.image,
+      handleOpen : props.handleOpenDialog
     }
   }
 
-  handleClickOpen = () => {
-    this.setState({ open: true });
-  };
-
-  handleClose = () => {
-    this.setState({ open: false });
-  };
-
+  
 
   render() {
 
@@ -114,34 +93,13 @@ class ImgMediaCard extends React.Component {
               direction="row"
               justify="flex-end"
               alignItems="center">
-              <Button size="small" color="primary" onClick={this.handleClickOpen} className={classes.Button} >
+              <Button size="small" color="primary" onClick={() => this.state.handleOpen(this.state.numberPlate)} className={classes.Button} >
                 Detalle
         </Button>
             </Grid>
           </CardActions>
         </Card>
 
-        <Dialog
-          fullScreen
-          open={this.state.open}
-          onClose={this.handleClose}
-          TransitionComponent={Transition}
-        >
-          <AppBar className={classes.appBar}>
-            <Toolbar>
-              <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
-                <CloseIcon />
-              </IconButton>
-              <Typography variant="title" color="inherit" className={classes.flex}>
-                Detalle
-              </Typography>
-              <Button color="inherit" onClick={this.handleClose}>
-                save
-              </Button>
-            </Toolbar>
-          </AppBar>
-          <DetailBody />
-        </Dialog>
       </div>
     );
   }

@@ -11,6 +11,15 @@ import Search from '@material-ui/icons/Search';
 import Button from '../../components-ui/CustomButtons/Button.jsx';
 import ImgMediaCard from '../CardItem'
 import getWeb3 from '../../utils/getWeb3'
+import Typography from '@material-ui/core/Typography';
+
+import Slide from '@material-ui/core/Slide';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Dialog from '@material-ui/core/Dialog';
+import CloseIcon from '@material-ui/icons/Close';
+import IconButton from '@material-ui/core/IconButton';
+import DetailBody from '../DetailBody'
 
 import VehicleFactoryContract from './../../buildContracts/VehicleFactory.json'
 
@@ -66,8 +75,19 @@ const styles = theme => ({
       borderColor: '#80bdff',
       boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
     },
-  }
+  },
+  appBar: {
+    position: 'relative',
+  },
+  flex: {
+    flex: 1,
+  },
 });
+
+
+function Transition(props) {
+  return <Slide direction="up" {...props} />;
+}
 
 
 class SearchView extends React.Component {
@@ -75,6 +95,7 @@ class SearchView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      open: false,
       input: "",
       checkNumberPlate: true,
       checkBrand: true,
@@ -189,7 +210,7 @@ class SearchView extends React.Component {
   manageVehicleDetail = async (_numberPlate) => {
     const vehicle = await this.execGetVehicleDetail(_numberPlate);
     const vehicleMapped = this.mappingVehicleDetailFromContract(vehicle);
-    //this.setState(vehicle <= vehicleMapped);
+    this.setState({vehicle: vehicleMapped});
   }
 
   onChange = () => e => {
@@ -218,6 +239,17 @@ class SearchView extends React.Component {
       [e.target.name]: e.target.checked
     });
   }
+
+
+  handleClickOpen = async (numberPlate) => {
+
+    await this.manageVehicleDetail(numberPlate)
+    this.setState({ open: true });
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
+  };
 
   render() {
     const { classes } = this.props;
@@ -252,7 +284,7 @@ class SearchView extends React.Component {
 
             </Grid>
 
-            <Grid container justify='space-between' alignItems='center' >
+            <Grid container justify='space-between' alignItems='center'>
 
               <FormControlLabel
                 control={
@@ -303,12 +335,32 @@ class SearchView extends React.Component {
           <Grid container direction='row' md={12} lg={12} alignItems='baseline' spacing={24} justify='center'>
             {
               this.state.vehiclesFiltered.map(cardVehicle => (
-                <ImgMediaCard numberPlate={cardVehicle.numberPlate} brand={cardVehicle.brand} model={cardVehicle.model} image={cardVehicle.image} />
+                <ImgMediaCard numberPlate={cardVehicle.numberPlate} brand={cardVehicle.brand} model={cardVehicle.model} image={cardVehicle.image} handleOpenDialog= {this.handleClickOpen} />
               ))
             }
           </Grid>
 
         </main>
+
+      <Dialog
+          fullScreen
+          open={this.state.open}
+          onClose={this.handleClose}
+          TransitionComponent={Transition}
+        >
+          <AppBar className={classes.appBar}>
+            <Toolbar>
+              <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
+                <CloseIcon />
+              </IconButton>
+              <Typography variant="title" color="inherit" className={classes.flex}>
+                Detalle
+              </Typography>
+              
+            </Toolbar>
+          </AppBar>
+          <DetailBody vehicle = {this.state.vehicle}/>
+        </Dialog>
 
       </div>)
 
