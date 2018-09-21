@@ -9,10 +9,12 @@ class RegisterView extends React.Component {
       super(props);
      
     }
-      render() { return 
-        <Typography variant="title" color="black" noWrap>
+      render() { 
+        return (
+        <Typography variant="title" style={{color: "black"}} noWrap>
         Album layout
         </Typography>
+        )
       }
     }
     export default RegisterView;

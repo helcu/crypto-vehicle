@@ -20,3 +20,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+src/client/build/contracts/Authorizable.json
+src/client/build/contracts/Migrations.json
+src/client/build/contracts/Ownable.json
