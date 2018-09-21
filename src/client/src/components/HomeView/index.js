@@ -147,13 +147,11 @@ class HomeView extends React.Component {
     });
 
     const _numberPlate = 'AWS-321';
-    //await this.getRegisterLogs(_numberPlate);
-    //await this.getUpdateLogs(_numberPlate);
-    await this.getAllLogs();
+    await this.getRegisterLogs(_numberPlate);
+    await this.getUpdateLogs(_numberPlate);
+    //await this.getAllLogs();
     //await this.watchForAllLog();
   }
-
-  // Search: COPIAR desde aquí
 
   elementsToAscii = (_hexArray) => {
     return _hexArray.map((e) => {
@@ -180,7 +178,7 @@ class HomeView extends React.Component {
     }
 
     let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
-      {}, //{ numberPlate: web3.fromAscii(_numberPlate), employeeAddress: accounts[0] },
+      { numberPlate: web3.fromAscii(_numberPlate) },
       { fromBlock: 0, toBlock: 'latest' }
     );
     vehicleRegisteredEvent.get((error, logs) => {
@@ -205,7 +203,7 @@ class HomeView extends React.Component {
     }
 
     let vehicleUpdatedEvent = this.state.vehicleFactoryInstance.VehicleUpdated(
-      {}, //{ numberPlate: web3.fromAscii(_numberPlate), employeeAddress: accounts[0] },
+      { numberPlate: web3.fromAscii(_numberPlate) },
       { fromBlock: 0, toBlock: 'latest' }
     );
     vehicleUpdatedEvent.get((error, logs) => {
@@ -234,7 +232,6 @@ class HomeView extends React.Component {
       vehicleAllEvent.stopWatching();
     });
   }
-  // Search: COPIAR hasta aquí
 
   watchForRegisterLog = async () => {
     vehicleRegisteredEventWatcher = this.state.vehicleFactoryInstance.VehicleRegistered(
