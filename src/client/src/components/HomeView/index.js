@@ -146,10 +146,11 @@ class HomeView extends React.Component {
       vehicleFactoryInstance: vehicleFactoryInstance
     });
 
-    const _numberPlate = 'AWS-321';
-    await this.getRegisterLogs(_numberPlate);
-    await this.getUpdateLogs(_numberPlate);
-    //await this.getAllLogs();
+    // SearchView.js
+    //const _numberPlate = 'AWS-321';
+    //await this.getRegisterLogs(_numberPlate);
+    //await this.getUpdateLogs(_numberPlate);
+    await this.getAllLogs();
     //await this.watchForAllLog();
   }
 
