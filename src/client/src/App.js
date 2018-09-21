@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -15,10 +16,12 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './components/ListItem';
-
+import Particles from 'react-particles-js'
 import {Route, Switch, Redirect, Link } from 'react-router-dom';
-import RegisterView from './components/RegisterView'
-
+import RegisterView from './components/RegisterView';
+import AdminView from './components/AdminView';
+import DrizzleMaterialForm from './components/DrizzleMaterialForm';
+import EmployeeView from './components/EmployeeView';
 
 const drawerWidth = 240;
 
@@ -99,6 +102,7 @@ const styles = theme => ({
 class Main extends React.Component {
   state = {
     open: true,
+    home: true
   };
 
   handleDrawerOpen = () => {
@@ -109,8 +113,41 @@ class Main extends React.Component {
     this.setState({ open: false });
   };
 
+  setHomeFalse = () => {
+    this.setState({ home: false});
+  };
+
   render() {
     const { classes } = this.props;
+    if(this.state.home){
+      return(
+        <div>
+          <div id="particles-js">
+                <Particles 
+                params={{
+                  particles: {
+                    number: {
+                      value: 25,
+                      density: {
+                        enable: true,
+                        value_area: 800
+                      }
+                    }
+                  }
+                }}
+                  />
+                  </div>
+                  <div id="message">
+                    <Typography variant="headline" align="center">Crypto Car</Typography>
+                    <br/>
+                    <Typography variant="body2" align="center">Bienvenido!</Typography>
+                    <Button variant="contained" size="large" style={{backgroundColor: "#3f51b5", color: "white"}} onClick={this.setHomeFalse}>
+                      Continuar
+                    </Button>
+                  </div>
+        </div>
+      )
+    }
 
     return (
       <React.Fragment>
@@ -173,11 +210,38 @@ class Main extends React.Component {
             <Route
               exact
               path="/register"
-              Component={<RegisterView/>} />
+              component={RegisterView} />
             <Route
               exact
               path="/page2"
               render={() =>  <p>  page 2 </p>} />
+            <Route
+              exact
+              name="adminEdit"
+              path="/admins/edit"
+              render={(state) => <DrizzleMaterialForm params={state} contract="Authorizable" method="setAdministrator" title="Edit Admin" to="/admins"  labels={["Address","DNI","Nombre"]} lenghts={[50,32,32]} inputTypes={["text","number","text"]}/>}/>
+            <Route
+              exact
+              path="/admins/add"
+              render={() => <DrizzleMaterialForm contract="Authorizable" method="setAdministrator" title="Add Admin" to="/admins" labels={["Address","DNI","Nombre"]} lenghts={[50,32,32]} inputTypes={["text","number","text"]}/>}/>              
+            <Route
+              path="/admins"
+              render={() => <AdminView contract="Authorizable" method="getEmployeesAdress"/>} />
+              <Route
+              exact
+              path="/employees/edit"
+              render={(state) => <DrizzleMaterialForm params={state} contract="Authorizable" method="setEmployee" title="Edit Employee" to="/employees" labels={["Address","DNI","Nombre"]} lenghts={[50,32,32]} inputTypes={["text","number","text"]}/>}/>
+            <Route
+              exact
+              path="/employees/add"
+              render={() => <DrizzleMaterialForm contract="Authorizable" method="setEmployee" title="Add Employee" to="/employees" labels={["Address","DNI","Nombre"]} lenghts={[50,32,32]} inputTypes={["text","number","text"]}/>}/>     
+            <Route
+              path="/employees"
+              render={() => <EmployeeView contract="Authorizable" method="getEmployeesAdress"/>} />
+            <Route
+              exact
+              path="/employees"
+              render={() => <p> employees </p>} />
             <Route render={() =>  <p>  error </p>} />
           </Switch>
 
