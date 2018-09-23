@@ -66,18 +66,7 @@ class VehicleInfo extends React.Component {
       },
       disabled: false
     }
-
-    console.log("VehicleInfo", this.state);
   }
-
-  /*componentWillReceiveProps(nextProps) {
-    this.forceUpdate();
-    this.setState(
-      ...this.state,
-      nextProps.vehicleData
-    );
-  }*/
-
 
   static getDerivedStateFromProps(nextProps, prevState) {
     if (
@@ -101,7 +90,6 @@ class VehicleInfo extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    //console.log(prevProps, prevState);
     if (
       prevProps.marca !== this.state.marca &&
       prevProps.modelo !== this.state.modelo &&

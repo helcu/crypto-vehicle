@@ -15,6 +15,9 @@ import InfoIcon from '@material-ui/icons/Info';
 import DirectionsCarIcon from '@material-ui/icons/DirectionsCar';
 import Grid from '@material-ui/core/Grid';
 
+import GaugeItem from '../GaugeItem';
+import MaterialGaugeItem from '../MaterialGaugeItem';
+
 import getWeb3 from '../../utils/getWeb3'
 
 import VehicleFactoryContract from './../../buildContracts/VehicleFactory.json'
@@ -37,7 +40,7 @@ const styles = theme => ({
     padding: theme.spacing.unit * 2,
     [theme.breakpoints.up(600 + theme.spacing.unit * 3 * 2)]: {
       marginTop: theme.spacing.unit * 6,
-      marginBottom: theme.spacing.unit * 6,
+      marginBottom: theme.spacing.unit * 1,
       padding: theme.spacing.unit * 3,
     },
   },
@@ -105,6 +108,8 @@ class HomeView extends React.Component {
     this.state = {
       expanded: null,
       value: 0,
+      vehicleCount: 0,
+      currentBlock: 0,
       logs: [],
       web3: null,
       vehicleFactoryInstance: null
@@ -114,10 +119,12 @@ class HomeView extends React.Component {
   componentDidMount = async () => {
     let results = await getWeb3
       .catch(() => {
-        console.log('Error finding web3.')
+        console.warn('Error finding web3.')
       });
 
-    await this.setState({ web3: results.web3 }, () => {
+    await this.setState({
+      web3: results.web3
+    }, () => {
       this.initContracts();
     });
   }
@@ -152,6 +159,12 @@ class HomeView extends React.Component {
     //await this.getUpdateLogs(_numberPlate);
     await this.getAllLogs();
     //await this.watchForAllLog();
+    this.initGauges();
+  }
+
+  initGauges = () => {
+    this.execGetVehiclesCount();
+    this.execGetCurrentBlock();
   }
 
   elementsToAscii = (_hexArray) => {
@@ -174,7 +187,7 @@ class HomeView extends React.Component {
     const accounts = await web3.eth.accounts;
 
     if (!accounts || !accounts[0]) {
-      console.log("There is no account.");
+      console.warn("There is no account.");
       return false;
     }
 
@@ -199,7 +212,7 @@ class HomeView extends React.Component {
     const accounts = await web3.eth.accounts;
 
     if (!accounts || !accounts[0]) {
-      console.log("There is no account.");
+      console.warn("There is no account.");
       return false;
     }
 
@@ -271,7 +284,6 @@ class HomeView extends React.Component {
         return;
       }
 
-      console.log("STATE: ", this.state);
       await this.insertLog(log);
     });
   }
@@ -301,7 +313,6 @@ class HomeView extends React.Component {
         this.setState({
           logs: logs
         }, () => {
-          //console.log("STATE: ", this.state);
           resolve();
         });
       }
@@ -391,6 +402,25 @@ class HomeView extends React.Component {
     return d + '/' + m + '/' + y + ' - ' + hh + ':' + mm + ':' + ss;
   }
 
+  execGetVehiclesCount = async () => {
+    const count = await this.state.vehicleFactoryInstance.getVehiclesCount();
+    this.setState({
+      vehicleCount: count.c[0]
+    });
+  }
+
+  execGetCurrentBlock = () => {
+    this.state.web3.eth.getBlockNumber((error, result) => {
+      if (error) {
+        console.warn(error);
+        return;
+      }
+      this.setState({
+        currentBlock: result
+      });
+    });
+  }
+
   handleChange = panel => (event, expanded) => {
     this.setState({
       expanded: expanded ? panel : false,
@@ -408,110 +438,118 @@ class HomeView extends React.Component {
 
     return (
       <div>
-        <CssBaseline />
-
         <main className={classes.layout}>
-          <Paper className={classes.paper}>
-            <ExpansionPanel>
-              <ExpansionPanelSummary>
-                <Typography className={classes.header}>
-                  Placa
-              </Typography>
-                <Typography className={classes.secondaryHeader}>
-                  Acción
-              </Typography>
-                <Typography className={classes.tertiaryHeader}>
-                  Fecha
-              </Typography>
-              </ExpansionPanelSummary>
-            </ExpansionPanel>
-            {
-              this.state.logs.map((log) => {
-                return (
-                  <ExpansionPanel
-                    key={log.transactionHash}
-                    expanded={expanded === log.transactionHash}
-                    onChange={this.handleChange(log.transactionHash)}>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography className={classes.heading}>
-                        {log.vehicle.numberPlate}
-                      </Typography>
-                      <Typography className={classes.secondaryHeading}>
-                        {events.names[log.event]}
-                      </Typography>
-                      <Typography className={classes.tertiaryHeading}>
-                        {log.timestamp}
-                      </Typography>
-                    </ExpansionPanelSummary>
-                    <Divider />
-                    <ExpansionPanelDetails>
-                      <div style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                      }}>
-                        <Tabs
-                          centered
-                          value={this.state.value}
-                          onChange={this.handleTabsChange}
-                          fullWidth
-                          indicatorColor="primary"
-                          textColor="primary">
-                          <Tab icon={<DirectionsCarIcon />} label="Vehículo" />
-                          <Tab icon={<InfoIcon />} label="Transacción" />
-                        </Tabs>
+          <Grid container>
+            <Grid container item sm={12} spacing={16}>
+              <GaugeItem title="VEHÍCULOS" value={this.state.vehicleCount} />
+              <GaugeItem title="TRANSACCIONES" value={this.state.logs.length} />
+              <GaugeItem title="BLOQUE ACTUAL" value={this.state.currentBlock} />
+              <GaugeItem title="X" value={this.state.vehicleCount} />
+            </Grid>
+            <Grid item sm={12}>
+              <Paper className={classes.paper}>
+                <ExpansionPanel>
+                  <ExpansionPanelSummary>
+                    <Typography className={classes.header}>
+                      Placa
+                    </Typography>
+                    <Typography className={classes.secondaryHeader}>
+                      Acción
+                    </Typography>
+                    <Typography className={classes.tertiaryHeader}>
+                      Fecha
+                    </Typography>
+                  </ExpansionPanelSummary>
+                </ExpansionPanel>
+                {
+                  this.state.logs.map((log) => {
+                    return (
+                      <ExpansionPanel
+                        key={log.transactionHash}
+                        expanded={expanded === log.transactionHash}
+                        onChange={this.handleChange(log.transactionHash)}>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography className={classes.heading}>
+                            {log.vehicle.numberPlate}
+                          </Typography>
+                          <Typography className={classes.secondaryHeading}>
+                            {events.names[log.event]}
+                          </Typography>
+                          <Typography className={classes.tertiaryHeading}>
+                            {log.timestamp}
+                          </Typography>
+                        </ExpansionPanelSummary>
+                        <Divider />
+                        <ExpansionPanelDetails>
+                          <div style={{
+                            flex: 1,
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                          }}>
+                            <Tabs
+                              centered
+                              value={this.state.value}
+                              onChange={this.handleTabsChange}
+                              fullWidth
+                              indicatorColor="primary"
+                              textColor="primary">
+                              <Tab icon={<DirectionsCarIcon />} label="Vehículo" />
+                              <Tab icon={<InfoIcon />} label="Transacción" />
+                            </Tabs>
 
-                        {value === 0 &&
-                          <TabContainer>
-                            <Grid container>
-                              <Grid item xs={2}>
-                                {log.event === events.realNames['VehicleRegistered'] ?
-                                  (<div>Modelo < br /></div>) :
-                                  (<div></div>)}
-                                Nº serie <br />
-                                Nº motor <br />
-                                Color<br />
-                                Razón
+                            {value === 0 &&
+                              <TabContainer>
+                                <Grid container>
+                                  <Grid item xs={2}>
+                                    {log.event === events.realNames['VehicleRegistered'] ?
+                                      (<div>Modelo < br /></div>) :
+                                      (<div></div>)}
+                                    Nº serie <br />
+                                    Nº motor <br />
+                                    Color<br />
+                                    Razón
                               </Grid>
-                              <Grid item xs={10}>
-                                {log.event === events.realNames['VehicleRegistered'] ?
-                                  (<div>{log.vehicle.marca} / {log.vehicle.modelo} <br /></div>) :
-                                  (<div></div>)}
-                                {log.vehicle.serialNumber} <br />
-                                {log.vehicle.motorNumber} <br />
-                                {log.vehicle.color} <br />
-                                {log.vehicle.reason}
-                              </Grid>
+                                  <Grid item xs={10}>
+                                    {log.event === events.realNames['VehicleRegistered'] ?
+                                      (<div>{log.vehicle.marca} / {log.vehicle.modelo} <br /></div>) :
+                                      (<div></div>)}
+                                    {log.vehicle.serialNumber} <br />
+                                    {log.vehicle.motorNumber} <br />
+                                    {log.vehicle.color} <br />
+                                    {log.vehicle.reason}
+                                  </Grid>
+                                </Grid>
+                              </TabContainer>
+                            }
+                            {value === 1 &&
+                              <TabContainer>
+                                <Grid container>
+                                  <Grid item xs={2}>
+                                    TxT Hash <br />
+                                    Block Hash <br />
+                                    Block Number <br />
+                                    Gas empleado <br />
+                                    Encargado
                             </Grid>
-                          </TabContainer>
-                        }
-                        {value === 1 &&
-                          <TabContainer>
-                            <Grid container>
-                              <Grid item xs={2}>
-                                TxT Hash <br />
-                                Block Hash <br />
-                                Block Number <br />
-                                Gas empleado <br />
-                                Encargado
-                            </Grid>
-                              <Grid item xs={10}>
-                                {log.transactionHash} <br />
-                                {log.blockHash} <br />
-                                {log.blockNumber} <br />
-                                {log.gasUsed}  <br />
-                                {log.vehicle.employeeAddress}
-                              </Grid>
-                            </Grid>
-                          </TabContainer>
-                        }
-                      </div>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                );
-              })
-            }
-          </Paper>
+                                  <Grid item xs={10}>
+                                    {log.transactionHash} <br />
+                                    {log.blockHash} <br />
+                                    {log.blockNumber} <br />
+                                    {log.gasUsed}  <br />
+                                    {log.vehicle.employeeAddress}
+                                  </Grid>
+                                </Grid>
+                              </TabContainer>
+                            }
+                          </div>
+                        </ExpansionPanelDetails>
+                      </ExpansionPanel>
+                    );
+                  })
+                }
+              </Paper>
+            </Grid>
+          </Grid>
         </main>
       </div>
     )
