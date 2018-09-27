@@ -106,7 +106,8 @@ class HomeView extends React.Component {
       currentBlock: 0,
       logs: [],
       web3: null,
-      vehicleFactoryInstance: null
+      vehicleFactoryInstance: null,
+      accounts: null
     };
   }
 
@@ -125,7 +126,6 @@ class HomeView extends React.Component {
 
   componentWillUnmount = () => {
     if (vehicleRegisteredEventWatcher) {
-      console.log("vehicleRegisteredEventWatcher: stopWatching");
       vehicleRegisteredEventWatcher.stopWatching();
     }
     if (vehicleUpdateEventWatcher) {
@@ -139,6 +139,7 @@ class HomeView extends React.Component {
   }
 
   initContracts = async () => {
+    
     const contract = require('truffle-contract');
     const vehicleFactory = contract(VehicleFactoryContract);
     vehicleFactory.setProvider(this.state.web3.currentProvider);
@@ -146,7 +147,6 @@ class HomeView extends React.Component {
     await this.setState({
       vehicleFactoryInstance: vehicleFactoryInstance
     });
-
     // SearchView.js
     //const _numberPlate = 'AWS-321';
     //await this.getRegisterLogs(_numberPlate);
@@ -178,52 +178,60 @@ class HomeView extends React.Component {
 
   getRegisterLogs = async (_numberPlate) => {
     const web3 = this.state.web3;
-    const accounts = await web3.eth.accounts;
-
-    if (!accounts || !accounts[0]) {
-      console.warn("There is no account.");
-      return false;
-    }
-
-    let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
-      { numberPlate: web3.fromAscii(_numberPlate) },
-      { fromBlock: 0, toBlock: 'latest' }
-    );
-    vehicleRegisteredEvent.get((error, logs) => {
-      if (error) {
-        console.warn(error);
-        return;
+    var accounts;
+    web3.eth.getAccounts(async (e,a)=>{
+      accounts = a;
+      if (!accounts || !accounts[0]) {
+        console.warn("There is no account.");
+        return false;
       }
-      logs.map(async (log) => {
-        await this.insertLog(log);
+  
+      let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
+        { numberPlate: web3.fromAscii(_numberPlate) },
+        { fromBlock: 0, toBlock: 'latest' }
+      );
+      vehicleRegisteredEvent.get((error, logs) => {
+        if (error) {
+          console.warn(error);
+          return;
+        }
+        logs.map(async (log) => {
+          await this.insertLog(log);
+        });
+        //vehicleRegisteredEvent.stopWatching();
       });
-      vehicleRegisteredEvent.stopWatching();
     });
+    
+    
   }
 
   getUpdateLogs = async (_numberPlate) => {
     const web3 = this.state.web3;
-    const accounts = await web3.eth.accounts;
-
-    if (!accounts || !accounts[0]) {
-      console.warn("There is no account.");
-      return false;
-    }
-
-    let vehicleUpdatedEvent = this.state.vehicleFactoryInstance.VehicleUpdated(
-      { numberPlate: web3.fromAscii(_numberPlate) },
-      { fromBlock: 0, toBlock: 'latest' }
-    );
-    vehicleUpdatedEvent.get((error, logs) => {
-      if (error) {
-        console.warn(error);
-        return;
+    var accounts;
+    web3.eth.getAccounts(async(e,a)=>{
+      accounts = a;
+      if (!accounts || !accounts[0]) {
+        console.warn("There is no account.");
+        return false;
       }
-      logs.map(async (log) => {
-        await this.insertLog(log);
+  
+      let vehicleUpdatedEvent = this.state.vehicleFactoryInstance.VehicleUpdated(
+        { numberPlate: web3.fromAscii(_numberPlate) },
+        { fromBlock: 0, toBlock: 'latest' }
+      );
+      vehicleUpdatedEvent.get((error, logs) => {
+        if (error) {
+          console.warn(error);
+          return;
+        }
+        logs.map(async (log) => {
+          await this.insertLog(log);
+        });
+        
       });
-      vehicleUpdatedEvent.stopWatching();
-    });
+      //vehicleUpdatedEvent.stopWatching();
+    })
+    
   }
 
   getAllLogs = async () => {
@@ -237,8 +245,9 @@ class HomeView extends React.Component {
       logs.forEach(async (log, i) => {
         await this.insertLog(log);
       });
-      vehicleAllEvent.stopWatching();
+     
     });
+    //vehicleAllEvent.stopWatching();
   }
 
   watchForRegisterLog = async () => {
@@ -427,7 +436,7 @@ class HomeView extends React.Component {
     const { classes } = this.props;
     const { expanded } = this.state;
     const { value } = this.state;
-
+    
     return (
       <div>
         <main className={classes.layout}>

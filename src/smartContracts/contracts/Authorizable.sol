@@ -13,6 +13,7 @@ contract Authorizable is Ownable {
         bytes32 name;
         bool isAdministrator;
         bool isEmployee;
+        bool isInArray;
     }
 
     address[] public employeesAccounts;
@@ -39,6 +40,11 @@ contract Authorizable is Ownable {
         return employees[_employeeAddress].isAdministrator;
     }
 
+    function getEmployeesAdress()
+    public view returns (address[]){
+        return employeesAccounts;
+    }
+
     function getEmployeesCount() 
     public view returns (uint) {
         return employeesAccounts.length;
@@ -54,15 +60,18 @@ contract Authorizable is Ownable {
     public onlyOwner {
         require(_toAdd != address(0), "You attempted to add permissions to 0x0 address.");
 
-        if(employees[_toAdd].isEmployee) {
+        if(employees[_toAdd].isEmployee && !employees[_toAdd].isAdministrator) {
             employees[_toAdd].isAdministrator = true;
         } else {
-            employees[_toAdd] = Employee(_dni, _name, true, true);
-            employeesAccounts.push(_toAdd);
+            if(!employees[_toAdd].isInArray) {
+                employeesAccounts.push(_toAdd);
+                employees[_toAdd].isInArray = true;
+            }
+            employees[_toAdd] = Employee(_dni, _name, true, true, employees[_toAdd].isInArray);
         }
     }
 
-    function removeAdministrator(address _toRemove)
+    function removeAdministrator(address _toRemove) 
     public onlyOwner {
         require(_toRemove != address(0), "You attempted to add permissions to 0x0 address.");
         employees[_toRemove].isAdministrator = false;
@@ -72,17 +81,18 @@ contract Authorizable is Ownable {
     public onlyAdministrator {
         require(_toAdd != address(0), "You attempted to add permissions to 0x0 address.");
 
-        if(employees[_toAdd].isEmployee) {
-            employees[_toAdd].isEmployee = true;
-        } else {
-            employees[_toAdd] = Employee(_dni, _name, false, true);
+        employees[_toAdd] = Employee(_dni, _name, employees[_toAdd].isAdministrator, true, employees[_toAdd].isInArray);
+        if(!employees[_toAdd].isInArray) {
             employeesAccounts.push(_toAdd);
+            employees[_toAdd].isInArray = true;
         }
+        
     }
 
     function removeEmployee(address _toRemove) 
     public onlyAdministrator {
         require(_toRemove != address(0), "You attempted to add permissions to 0x0 address.");
         employees[_toRemove].isEmployee = false;
+        //employees[_toRemove].isAdministrator = false;
     }
 }

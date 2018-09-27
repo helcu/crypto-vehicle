@@ -8,7 +8,8 @@ import CommuteIcon from '@material-ui/icons/Commute';
 import SearchIcon from '@material-ui/icons/Search';
 //import BarChartIcon from '@material-ui/icons/BarChart';
 //import LayersIcon from '@material-ui/icons/Layers';
-import AssignmentIcon from '@material-ui/icons/Assignment';
+import BuildIcon from '@material-ui/icons/Build';
+import GroupIcon from '@material-ui/icons/Group';
 import { Link } from 'react-router-dom';
 
 export const mainListItems = (
@@ -50,16 +51,17 @@ export const mainListItems = (
 
 export const secondaryListItems = (
   <div>
-    <ListSubheader inset>Gestión de accesos</ListSubheader>
-    <ListItem button>
+
+    <ListSubheader inset>Gestion De Accesos</ListSubheader>
+    <ListItem component={Link} to="/admins" button>
       <ListItemIcon>
-        <AssignmentIcon />
+        <BuildIcon />
       </ListItemIcon>
       <ListItemText primary="Administradores" />
     </ListItem>
-    <ListItem button>
+    <ListItem component={Link} to="/employees" button>
       <ListItemIcon>
-        <AssignmentIcon />
+        <GroupIcon />
       </ListItemIcon>
       <ListItemText primary="Trabajadores" />
     </ListItem>

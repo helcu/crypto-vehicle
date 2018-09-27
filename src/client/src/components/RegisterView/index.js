@@ -201,7 +201,6 @@ class RegisterView extends React.Component {
 
     _ownersId = this.elementsToHex(_ownersId);
     _ownersNames = this.elementsToHex(_ownersNames);
-
     let wasRegistered = false;
     try {
       wasRegistered = await vehicleFactoryInstance.registerVehicle(
@@ -213,6 +212,7 @@ class RegisterView extends React.Component {
     } catch (e) {
       console.warn(e);
     }
+
 
     /*if(wasRegistered) {
       this.setState({ 
@@ -241,7 +241,8 @@ class RegisterView extends React.Component {
 
   watchForRegisterLog = async (_numberPlate) => {
     const web3 = this.state.web3;
-    const accounts = await web3.eth.accounts;
+    var accounts = await this.getAccounts();
+    console.log(accounts);
 
     if (!accounts || !accounts[0]) {
       console.log("There is no account.");
@@ -291,7 +292,7 @@ class RegisterView extends React.Component {
       });
 
       console.log("watchForRegisterLog", vehicleLogs);
-      vehicleRegisteredEvent.stopWatching();
+      //vehicleRegisteredEvent.stopWatching();
     });
   }
   /*-------------------------- HANDLERS ------------------------------------*/
@@ -322,9 +323,20 @@ class RegisterView extends React.Component {
     return await vehicleFactoryInstance.motorNumberExists(this.state.web3.fromAscii(_motorNumber));
   }
 
+  getAccounts = async () => {
+    return new Promise((resolve, reject) => {
+      this.state.web3.eth.getAccounts(async (error, accounts) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(accounts);
+      });
+    });
+  }
+
   handleRegisterVehicle = async () => {
-    const web3 = this.state.web3;
-    const accounts = await web3.eth.accounts;
+    var accounts = await this.getAccounts();
+    console.log(accounts);
 
     if (!accounts || !accounts[0]) {
       console.log("There is no account.");
@@ -362,7 +374,7 @@ class RegisterView extends React.Component {
     let _owners = this.getOwnersDetail(this.state.owners);
     let _ownersId = _owners[0];
     let _ownersNames = _owners[1];
-
+    console.log(_photos, _documents);
     return await this.execRegisterVehicle(
       _numberPlate, _brand, _model,
       _color, _serialNumber, _motorNumber, _reason,
@@ -646,6 +658,8 @@ class RegisterView extends React.Component {
                         style={previewStyle} />
                     </div>
                   )}
+
+
                 </React.Fragment>
               ) : (
                   <React.Fragment>

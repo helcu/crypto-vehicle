@@ -2,8 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 //import Content from './components/Content';
+import { DrizzleProvider } from 'drizzle-react';
 import { BrowserRouter} from 'react-router-dom';
 import Main from './App.js' 
+import LoadingContainer from './components/LoadingContainer'
+import Authorizable from './buildContracts/Authorizable.json'
+import { Route, Redirect } from 'react-router-dom';
 const theme = createMuiTheme({
   palette: {
     primary: {
@@ -37,6 +41,18 @@ const theme = createMuiTheme({
   },
 });
 
+const options = {
+  web3: {
+    block: false,
+    fallback: {
+      url: 'http://127.0.0.1:7545'
+    }
+  },
+  contracts: [
+    Authorizable
+  ]
+}
+
 export class App extends React.Component {
     render() {
       return (
@@ -48,5 +64,18 @@ export class App extends React.Component {
       )
     }
   }
-ReactDOM.render(<App />, document.getElementById('root'));
+
+ReactDOM.render(
+    <DrizzleProvider options={options}>
+        <LoadingContainer>
+          <BrowserRouter>
+            <div>
+            <Redirect from="*" to="/" />
+            <Route exact path="/" component={App} />
+            </div>
+          </BrowserRouter>
+          </LoadingContainer>
+    </DrizzleProvider>
+    , document.getElementById('root'));
+    
 
