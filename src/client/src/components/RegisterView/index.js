@@ -166,7 +166,6 @@ class RegisterView extends React.Component {
     //_documents = "QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm";
     _ownersId = this.elementsToHex(_ownersId);
     _ownersNames = this.elementsToHex(_ownersNames);
-
     let wasRegistered = await vehicleFactoryInstance.registerVehicle(
       web3.fromAscii(_numberPlate), web3.fromAscii(_brand), web3.fromAscii(_model),
       web3.fromAscii(_color), web3.fromAscii(_serialNumber), web3.fromAscii(_motorNumber), web3.fromAscii(_reason),
@@ -269,32 +268,35 @@ class RegisterView extends React.Component {
 
   handleRegisterVehicle = async () => {
     const web3 = this.state.web3;
-    const accounts = await web3.eth.accounts;
-
-    if (!accounts || !accounts[0]) {
-      console.log("There is no account.");
-      return false;
-    }
-
-    let _numberPlate = this.state.numberPlate;
-    let _brand = this.state.marca;
-    let _model = this.state.modelo
-    let _color = this.state.color;
-    let _serialNumber = this.state.serialNumber;
-    let _motorNumber = this.state.motorNumber;
-    let _reason = this.state.reason;
-    let _photos = await this.imageToIpfsString(this.state.images).catch(e => console.log(e));
-    let _documents = await this.imageToIpfsString(this.state.documents).catch(e => console.log(e));
-    let _owners = this.getOwnersDetail(this.state.owners);
-    let _ownersId = _owners[0];
-    let _ownersNames = _owners[1];
-
-    return await this.execRegisterVehicle(
-      _numberPlate, _brand, _model,
-      _color, _serialNumber, _motorNumber, _reason,
-      _photos, _documents, _ownersId, _ownersNames,
-      accounts[0]
-    );
+    console.log(web3)
+    var accounts;
+    web3.eth.getAccounts(async (e,a)=>{
+       accounts = a
+       console.log(a)
+       if (!accounts || !accounts[0]) {
+        console.log("There is no account.");
+        return false;
+      }
+      let _numberPlate = this.state.numberPlate;
+      let _brand = this.state.marca;
+      let _model = this.state.modelo
+      let _color = this.state.color;
+      let _serialNumber = this.state.serialNumber;
+      let _motorNumber = this.state.motorNumber;
+      let _reason = this.state.reason;
+      let _photos = await this.imageToIpfsString(this.state.images).catch(e => console.log(e));
+      let _documents = await this.imageToIpfsString(this.state.documents).catch(e => console.log(e));
+      let _owners = this.getOwnersDetail(this.state.owners);
+      let _ownersId = _owners[0];
+      let _ownersNames = _owners[1];
+      console.log(_photos,_documents);
+      return await this.execRegisterVehicle(
+        _numberPlate, _brand, _model,
+        _color, _serialNumber, _motorNumber, _reason,
+        _photos, _documents, _ownersId, _ownersNames,
+        accounts[0]
+      );
+     });    
   }
 
   imageToIpfsString = async (images) => {
