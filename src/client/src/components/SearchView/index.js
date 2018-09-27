@@ -168,9 +168,20 @@ class SearchView extends React.Component {
   }
 
 
+  getAccounts = async () => {
+    return new Promise((resolve, reject) => {
+      this.state.web3.eth.getAccounts(async (error, accounts) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(accounts);
+      });
+    });
+  }
+
   getRegisterLogs = async (_numberPlate) => {
     const web3 = this.state.web3;
-    const accounts = await web3.eth.accounts;
+    const accounts = await this.getAccounts();
 
     if (!accounts || !accounts[0]) {
       console.log("There is no account.");
@@ -189,13 +200,13 @@ class SearchView extends React.Component {
       logs.map(async (log) => {
         await this.insertLog(log);
       });
-      vehicleRegisteredEvent.stopWatching();
+      //vehicleRegisteredEvent.stopWatching();
     });
   }
 
   getUpdateLogs = async (_numberPlate) => {
     const web3 = this.state.web3;
-    const accounts = await web3.eth.accounts;
+    const accounts = await this.getAccounts();
 
     if (!accounts || !accounts[0]) {
       console.log("There is no account.");
@@ -214,7 +225,7 @@ class SearchView extends React.Component {
       logs.map(async (log) => {
         await this.insertLog(log);
       });
-      vehicleUpdatedEvent.stopWatching();
+      //vehicleUpdatedEvent.stopWatching();
     });
   }
 
@@ -560,7 +571,7 @@ class SearchView extends React.Component {
 
             </Toolbar>
           </AppBar>
-          <DetailBody vehicle={this.state.vehicle} logs={this.state.logs}/>
+          <DetailBody vehicle={this.state.vehicle} logs={this.state.logs} />
         </Dialog>
 
       </div>)
