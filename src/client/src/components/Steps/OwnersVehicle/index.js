@@ -1,17 +1,12 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import {
+  Button, TextField, Typography, Grid,
+  Table, TableBody, TableCell, TableHead, TableRow
+} from '@material-ui/core';
 
 
 const styles = theme => ({
@@ -60,6 +55,7 @@ class OwnersVehicle extends React.Component {
     super(props);
 
     this.state = {
+      dialog: this.props.dialog,
       owners: props.owners,
       dni: "",
       name: "",
@@ -86,7 +82,7 @@ class OwnersVehicle extends React.Component {
     this.setState({
       owners: [...this.state.owners, newItem]
     }, () => {
-      this.props.update(this.state)
+      this.props.update(this.state);
     });
   }
 
@@ -96,7 +92,15 @@ class OwnersVehicle extends React.Component {
     const name = this.state.name;
 
     if (dni.length === 0 || name.length === 0) {
-      alert("Ambos campos son obligatorios.");
+      this.setState({
+        dialog: {
+          open: true,
+          title: 'Aviso',
+          description: 'Ambos campos son obligatorios.'
+        }
+      }, () => {
+        this.props.update(this.state);
+      });
       return;
     }
 
@@ -107,7 +111,15 @@ class OwnersVehicle extends React.Component {
     });
 
     if (invalidInputs.length > 0) {
-      alert("Algunos campos no cumplen con el formato.");
+      this.setState({
+        dialog: {
+          open: true,
+          title: 'Aviso',
+          description: 'Algunos campos no cumplen con el formato.'
+        }
+      }, () => {
+        this.props.update(this.state);
+      });
       return;
     }
 
@@ -116,7 +128,15 @@ class OwnersVehicle extends React.Component {
     });
 
     if (equalDni.length > 0) {
-      alert("El DNI no puede repetirse.");
+      this.setState({
+        dialog: {
+          open: true,
+          title: 'Aviso',
+          description: 'El DNI no puede repetirse.'
+        }
+      }, () => {
+        this.props.update(this.state);
+      });
       return;
     }
 
@@ -131,6 +151,11 @@ class OwnersVehicle extends React.Component {
           dni: false,
           name: false
         }
+      },
+      dialog: {
+        open: false,
+        title: '',
+        description: ''
       }
     });
   }
@@ -165,6 +190,11 @@ class OwnersVehicle extends React.Component {
             ...this.state.inputs.errors,
             [name]: !hasPattern
           }
+        },
+        dialog: {
+          open: false,
+          title: '',
+          description: ''
         }
       }, () => {
         this.props.update(this.state);

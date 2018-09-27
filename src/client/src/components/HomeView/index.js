@@ -1,22 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import Typography from '@material-ui/core/Typography';
+import {
+  ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography,
+  Paper, Divider, Tabs, Tab, Grid
+} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Paper from '@material-ui/core/Paper';
-import Divider from '@material-ui/core/Divider';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import InfoIcon from '@material-ui/icons/Info';
 import DirectionsCarIcon from '@material-ui/icons/DirectionsCar';
-import Grid from '@material-ui/core/Grid';
 
 import GaugeItem from '../GaugeItem';
-import MaterialGaugeItem from '../MaterialGaugeItem';
+//import MaterialGaugeItem from '../MaterialGaugeItem';
 
 import getWeb3 from '../../utils/getWeb3'
 
@@ -157,7 +151,7 @@ class HomeView extends React.Component {
     //const _numberPlate = 'AWS-321';
     //await this.getRegisterLogs(_numberPlate);
     //await this.getUpdateLogs(_numberPlate);
-    await this.getAllLogs();
+    this.getAllLogs();
     //await this.watchForAllLog();
     this.initGauges();
   }
@@ -307,12 +301,10 @@ class HomeView extends React.Component {
             break;
         }
 
-        let logs = this.state.logs;
-        logs.unshift(log);
-
         this.setState({
-          logs: logs
+          logs: [log, ...this.state.logs]
         }, () => {
+          console.log(log);
           resolve();
         });
       }
@@ -508,7 +500,7 @@ class HomeView extends React.Component {
                                     Nº motor <br />
                                     Color<br />
                                     Razón
-                              </Grid>
+                                  </Grid>
                                   <Grid item xs={10}>
                                     {log.event === events.realNames['VehicleRegistered'] ?
                                       (<div>{log.vehicle.marca} / {log.vehicle.modelo} <br /></div>) :
@@ -530,7 +522,7 @@ class HomeView extends React.Component {
                                     Block Number <br />
                                     Gas empleado <br />
                                     Encargado
-                            </Grid>
+                                  </Grid>
                                   <Grid item xs={10}>
                                     {log.transactionHash} <br />
                                     {log.blockHash} <br />

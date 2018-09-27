@@ -1,29 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
-import Icon from "@material-ui/core/Icon";
+//import {Typography, Paper, Grid, Icon} from '@material-ui/core';
 
 // @material-ui/icons
-import Store from "@material-ui/icons/Store";
 import Warning from "@material-ui/icons/Warning";
+import Language from "@material-ui/icons/Language";
+/*import Store from "@material-ui/icons/Store";
 import DateRange from "@material-ui/icons/DateRange";
 import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
-import Accessibility from "@material-ui/icons/Accessibility";
-import Language from "@material-ui/icons/Language";
+import Accessibility from "@material-ui/icons/Accessibility";*/
 
 // creative-tim/material_dashboard/core
 import GridItem from "../../components-ui/Grid/GridItem.jsx";
-import GridContainer from "../../components-ui/Grid/GridContainer.jsx";
+//import GridContainer from "../../components-ui/Grid/GridContainer.jsx";
 import Danger from "../../components-ui/Typography/Danger.jsx";
 import Card from "../../components-ui/Card/Card.jsx";
 import CardHeader from "../../components-ui/Card/CardHeader.jsx";
 import CardIcon from "../../components-ui/Card/CardIcon.jsx";
 import CardFooter from "../../components-ui/Card/CardFooter.jsx";
-import CardBody from "../../components-ui//Card/CardBody.jsx";
+//import CardBody from "../../components-ui//Card/CardBody.jsx";
 
 const styles = theme => ({
   upArrowCardCategory: {

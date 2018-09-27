@@ -26,7 +26,7 @@ export const mainListItems = (
         <ListItemIcon>
           <SearchIcon />
         </ListItemIcon>
-        <ListItemText primary="Consulta Vehicular" />
+        <ListItemText primary="Consulta vehicular" />
       </ListItem>
     </Link>
     <Link to='/register' style={{ textDecoration: 'none' }} replace={true} >
@@ -34,7 +34,7 @@ export const mainListItems = (
         <ListItemIcon>
           <CommuteIcon />
         </ListItemIcon>
-        <ListItemText primary="Registro Vehicular" />
+        <ListItemText primary="Registro vehicular" />
       </ListItem>
     </Link>
     <Link to='/update' style={{ textDecoration: 'none' }} replace={true} >
@@ -42,7 +42,7 @@ export const mainListItems = (
         <ListItemIcon>
           <CommuteIcon />
         </ListItemIcon>
-        <ListItemText primary="Actualización Vehicular" />
+        <ListItemText primary="Actualización vehicular" />
       </ListItem>
     </Link>
   </div>
@@ -50,7 +50,7 @@ export const mainListItems = (
 
 export const secondaryListItems = (
   <div>
-    <ListSubheader inset>Gestión De Accesos</ListSubheader>
+    <ListSubheader inset>Gestión de accesos</ListSubheader>
     <ListItem button>
       <ListItemIcon>
         <AssignmentIcon />
