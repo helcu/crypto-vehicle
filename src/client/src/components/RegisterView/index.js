@@ -200,47 +200,45 @@ class RegisterView extends React.Component {
 
   watchForRegisterLog = async (_numberPlate) => {
     const web3 = this.state.web3;
-    var accounts;
+    var accounts = await this.getAccounts();
+    console.log(accounts);
 
-    web3.eth.getAccounts(async(e,a)=>{
-      accounts = a;
-      if (!accounts || !accounts[0]) {
-        console.log("There is no account.");
-        return false;
+    if (!accounts || !accounts[0]) {
+      console.log("There is no account.");
+      return false;
+    }
+
+    let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
+      { numberPlate: web3.fromAscii(_numberPlate), employeeAddress: accounts[0] },
+      { toBlock: 'latest' }
+    );
+
+    vehicleRegisteredEvent.watch((error, log) => {
+      if (error) {
+        return;
       }
-  
-      let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
-        { numberPlate: web3.fromAscii(_numberPlate), employeeAddress: accounts[0] },
-        { toBlock: 'latest' }
-      );
-  
-      vehicleRegisteredEvent.watch((error, log) => {
-        if (error) {
-          return;
+
+      const vehicle = log.args;
+      const vehicleLogs = {
+        event: log.event,
+        blockHash: log.blockHash,
+        transactionHash: log.transactionHash,
+        vehicle: {
+          numberPlate: web3.toAscii(vehicle.numberPlate),
+          marca: web3.toAscii(vehicle.brand),
+          modelo: web3.toAscii(vehicle.model),
+          color: web3.toAscii(vehicle.color),
+          serialNumber: web3.toAscii(vehicle.serialNumber),
+          motorNumber: web3.toAscii(vehicle.motorNumber),
+          reason: web3.toAscii(vehicle.reason),
+          photos: vehicle.photos,
+          documents: vehicle.documents,
+          owners: this.getOwnersFromContract(this.elementsToAscii(vehicle.ownersId), this.elementsToAscii(vehicle.ownersNames)),
+          employeeAdress: vehicle.employeeAddress
         }
-  
-        const vehicle = log.args;
-        const vehicleLogs = {
-          event: log.event,
-          blockHash: log.blockHash,
-          transactionHash: log.transactionHash,
-          vehicle: {
-            numberPlate: web3.toAscii(vehicle.numberPlate),
-            marca: web3.toAscii(vehicle.brand),
-            modelo: web3.toAscii(vehicle.model),
-            color: web3.toAscii(vehicle.color),
-            serialNumber: web3.toAscii(vehicle.serialNumber),
-            motorNumber: web3.toAscii(vehicle.motorNumber),
-            reason: web3.toAscii(vehicle.reason),
-            photos: vehicle.photos,
-            documents: vehicle.documents,
-            owners: this.getOwnersFromContract(this.elementsToAscii(vehicle.ownersId), this.elementsToAscii(vehicle.ownersNames)),
-            employeeAdress: vehicle.employeeAddress
-          }
-        }
-        console.log("watchForRegisterLog", vehicleLogs);
-        //vehicleRegisteredEvent.stopWatching();
-      });
+      }
+      console.log("watchForRegisterLog", vehicleLogs);
+      //vehicleRegisteredEvent.stopWatching();
     });
   }
   /*-------------------------- HANDLERS ------------------------------------*/
@@ -269,37 +267,44 @@ class RegisterView extends React.Component {
     return await vehicleFactoryInstance.motorNumberExists(this.state.web3.fromAscii(_motorNumber));
   }
 
+  getAccounts = async () => {
+    return new Promise((resolve, reject) => {
+      this.state.web3.eth.getAccounts(async (error, accounts) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(accounts);
+      });
+    });
+  }
+
   handleRegisterVehicle = async () => {
-    const web3 = this.state.web3;
-    console.log(web3)
-    var accounts;
-    web3.eth.getAccounts(async (e,a)=>{
-       accounts = a
-       console.log(a)
-       if (!accounts || !accounts[0]) {
-        console.log("There is no account.");
-        return false;
-      }
-      let _numberPlate = this.state.numberPlate;
-      let _brand = this.state.marca;
-      let _model = this.state.modelo
-      let _color = this.state.color;
-      let _serialNumber = this.state.serialNumber;
-      let _motorNumber = this.state.motorNumber;
-      let _reason = this.state.reason;
-      let _photos = await this.imageToIpfsString(this.state.images).catch(e => console.log(e));
-      let _documents = await this.imageToIpfsString(this.state.documents).catch(e => console.log(e));
-      let _owners = this.getOwnersDetail(this.state.owners);
-      let _ownersId = _owners[0];
-      let _ownersNames = _owners[1];
-      console.log(_photos,_documents);
-      return await this.execRegisterVehicle(
-        _numberPlate, _brand, _model,
-        _color, _serialNumber, _motorNumber, _reason,
-        _photos, _documents, _ownersId, _ownersNames,
-        accounts[0]
-      );
-     });    
+    var accounts = await this.getAccounts();
+    console.log(accounts);
+
+    if (!accounts || !accounts[0]) {
+      console.log("There is no account.");
+      return false;
+    }
+    let _numberPlate = this.state.numberPlate;
+    let _brand = this.state.marca;
+    let _model = this.state.modelo
+    let _color = this.state.color;
+    let _serialNumber = this.state.serialNumber;
+    let _motorNumber = this.state.motorNumber;
+    let _reason = this.state.reason;
+    let _photos = await this.imageToIpfsString(this.state.images).catch(e => console.log(e));
+    let _documents = await this.imageToIpfsString(this.state.documents).catch(e => console.log(e));
+    let _owners = this.getOwnersDetail(this.state.owners);
+    let _ownersId = _owners[0];
+    let _ownersNames = _owners[1];
+    console.log(_photos, _documents);
+    return await this.execRegisterVehicle(
+      _numberPlate, _brand, _model,
+      _color, _serialNumber, _motorNumber, _reason,
+      _photos, _documents, _ownersId, _ownersNames,
+      accounts[0]
+    );
   }
 
   imageToIpfsString = async (images) => {
@@ -478,7 +483,7 @@ class RegisterView extends React.Component {
                     En breve, el vehículo será registrado en el sistema.
                   </Typography>
                   <div>
-                  <img alt="defaultImage" src={'http://img.hb.aicdn.com/b8a424268462760d5de121b6f00b2825b8da36ca75e7a-krbIE7_fw658'} />
+                    <img alt="defaultImage" src={'http://img.hb.aicdn.com/b8a424268462760d5de121b6f00b2825b8da36ca75e7a-krbIE7_fw658'} />
                   </div>
                 </React.Fragment>
               ) : (
