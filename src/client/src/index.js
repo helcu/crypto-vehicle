@@ -29,7 +29,7 @@ const theme = createMuiTheme({
         borderRadius: 3,
         border: 0,
         color: 'white',
-        height: 30,
+        //height: 30,
         padding: '0 20px',
         boxShadow: '0 3px 5px 2px rgba(64, 64, 64, .3)',
       },

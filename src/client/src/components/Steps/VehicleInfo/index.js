@@ -67,17 +67,7 @@ class VehicleInfo extends React.Component {
       disabled: false
     }
 
-    console.log("VehicleInfo", this.state);
   }
-
-  /*componentWillReceiveProps(nextProps) {
-    this.forceUpdate();
-    this.setState(
-      ...this.state,
-      nextProps.vehicleData
-    );
-  }*/
-
 
   static getDerivedStateFromProps(nextProps, prevState) {
     if (
@@ -101,7 +91,6 @@ class VehicleInfo extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    //console.log(prevProps, prevState);
     if (
       prevProps.marca !== this.state.marca &&
       prevProps.modelo !== this.state.modelo &&
@@ -167,29 +156,34 @@ class VehicleInfo extends React.Component {
   };
 
   validateInputs = async () => {
+    return new Promise((resolve, reject) => {
+      try {
+        const invalidInputs = Object.entries(inputsPattern.onBlur).map((e) => {
+          const name = e[0];
+          const value = this.state[name].toUpperCase().trim();
+          const regPattern = new RegExp(inputsPattern.onBlur[name]);
+          const hasPattern = regPattern.test(value);
+          return [
+            [name],
+            hasPattern ? defaultMessages.success : defaultMessages.error + " " + defaultMessages[name],
+            !hasPattern
+          ];
+        });
 
-    const invalidInputs = Object.entries(inputsPattern.onBlur).map((e) => {
-      const name = e[0];
-      const value = this.state[name].toUpperCase().trim();
-      const regPattern = new RegExp(inputsPattern.onBlur[name]);
-      const hasPattern = regPattern.test(value);
-      return [
-        [name],
-        hasPattern ? defaultMessages.success : defaultMessages.error + " " + defaultMessages[name],
-        !hasPattern
-      ];
-    });
+        var messages = Object.assign(...invalidInputs.map(d => ({ [d[0]]: d[1] })));
+        var errors = Object.assign(...invalidInputs.map(d => ({ [d[0]]: d[2] })));
 
-    var messages = Object.assign(...invalidInputs.map(d => ({ [d[0]]: d[1] })));
-    var errors = Object.assign(...invalidInputs.map(d => ({ [d[0]]: d[2] })));
-
-    this.setState({
-      inputs: {
-        messages: messages,
-        errors: errors
+        this.setState({
+          inputs: {
+            messages: messages,
+            errors: errors
+          }
+        }, () => {
+          this.props.update(this.state, (() => { resolve(); }));
+        });
+      } catch (e) {
+        reject(e);
       }
-    }, () => {
-      this.props.update(this.state);
     });
   };
 

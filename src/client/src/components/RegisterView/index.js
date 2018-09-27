@@ -1,13 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Paper from '@material-ui/core/Paper';
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import Button from '@material-ui/core/Button';
+import {
+  Typography, CssBaseline, Paper, Stepper, Step, StepLabel, Button, CircularProgress,
+  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
+} from '@material-ui/core';
+
+import BeforeIcon from '@material-ui/icons/NavigateBefore';
+import NextIcon from '@material-ui/icons/NavigateNext';
+import CheckIcon from '@material-ui/icons/Check';
+
+import green from '@material-ui/core/colors/green';
 
 import VehicleInfo from '../Steps/VehicleInfo';
 import ImagesVehicle from '../Steps/ImagesVehicle';
@@ -54,6 +57,30 @@ const styles = theme => ({
     marginTop: theme.spacing.unit * 3,
     marginLeft: theme.spacing.unit,
   },
+  leftIcon: {
+    marginRight: theme.spacing.unit,
+  },
+  rightIcon: {
+    marginLeft: theme.spacing.unit,
+  },
+  wrapper: {
+    margin: theme.spacing.unit,
+    position: 'relative',
+  },
+  buttonSuccess: {
+    backgroundColor: green[500],
+    '&:hover': {
+      backgroundColor: green[700],
+    },
+  },
+  buttonProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
+  }
 });
 
 const steps = ['Datos', 'Fotos', 'Documentos', 'Propietarios'];
@@ -64,6 +91,13 @@ class RegisterView extends React.Component {
     super(props);
     this.state = {
       activeStep: 0,
+      loading: false,
+      success: false,
+      dialog: {
+        open: false,
+        title: '',
+        description: ''
+      },
       numberPlate: '',
       marca: '',
       modelo: '',
@@ -72,12 +106,19 @@ class RegisterView extends React.Component {
       motorNumber: '',
       reason: '',
       images: [],
+      imagesNames: [],
+      imagesNamesErrors: [],
       documents: [],
+      documentsNames: [],
+      documentsNamesErrors: [],
       owners: [],
       web3: null,
       vehicleFactoryInstance: null
     };
+
     this.vehicleInfoChild = React.createRef();
+    this.vehicleImagesChild = React.createRef();
+    this.vehicleDocumentsChild = React.createRef();
   }
 
   elementsToHex = (_asciiArray) => {
@@ -95,7 +136,14 @@ class RegisterView extends React.Component {
   componentDidMount = async () => {
     let results = await getWeb3
       .catch(() => {
-        console.log('Error finding web3.')
+        console.warn('Error finding web3.');
+        this.setState({
+          dialog: {
+            open: true,
+            title: 'Componente no encontrado',
+            description: 'Web3 no ha sido encontrado. Vuelva a cargar la página.'
+          }
+        });
       });
 
     await this.setState({ web3: results.web3 }, () => {
@@ -116,12 +164,19 @@ class RegisterView extends React.Component {
       case 0:
         return <VehicleInfo ref={this.vehicleInfoChild} {...this.state} update={this.updateStates} />;
       case 1:
-        return <ImagesVehicle {...this.state} update={this.updateStates} />;
+        return <ImagesVehicle innerRef={this.vehicleImagesChild} {...this.state} update={this.updateStates} />;
       case 2:
-        return <DocumentsVehicle {...this.state} update={this.updateStates} />;
+        return <DocumentsVehicle innerRef={this.vehicleDocumentsChild} {...this.state} update={this.updateStates} />;
       case 3:
         return <OwnersVehicle {...this.state} update={this.updateStates} />;
       default:
+        this.setState({
+          dialog: {
+            open: true,
+            title: 'Paso incorrecto',
+            description: 'Está fuera de los pasos existentes. Vuelva a cargar la página.'
+          }
+        });
         throw new Error('Unknown step');
     }
   }
@@ -144,35 +199,20 @@ class RegisterView extends React.Component {
     const web3 = this.state.web3;
     const vehicleFactoryInstance = this.state.vehicleFactoryInstance;
 
-    let exists = await vehicleFactoryInstance.vehicleExists(web3.fromAscii(_numberPlate));
-    if (exists) {
-      console.log("La placa del vehículo ya está registrada.");
-      return false;
-    }
-
-    exists = await vehicleFactoryInstance.serialNumberExists(web3.fromAscii(_serialNumber));
-    if (exists) {
-      console.log("El número de serie ya está registrado.");
-      return false;
-    }
-
-    exists = await vehicleFactoryInstance.motorNumberExists(web3.fromAscii(_motorNumber));
-    if (exists) {
-      console.log("El número de motor ya está registrado.");
-      return false;
-    }
-
-    //_photos = "QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm";
-    //_documents = "QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm";
     _ownersId = this.elementsToHex(_ownersId);
     _ownersNames = this.elementsToHex(_ownersNames);
 
-    let wasRegistered = await vehicleFactoryInstance.registerVehicle(
-      web3.fromAscii(_numberPlate), web3.fromAscii(_brand), web3.fromAscii(_model),
-      web3.fromAscii(_color), web3.fromAscii(_serialNumber), web3.fromAscii(_motorNumber), web3.fromAscii(_reason),
-      _photos, _documents, _ownersId, _ownersNames,
-      { from: _userAddress }
-    );
+    let wasRegistered = false;
+    try {
+      wasRegistered = await vehicleFactoryInstance.registerVehicle(
+        web3.fromAscii(_numberPlate), web3.fromAscii(_brand), web3.fromAscii(_model),
+        web3.fromAscii(_color), web3.fromAscii(_serialNumber), web3.fromAscii(_motorNumber), web3.fromAscii(_reason),
+        _photos, _documents, _ownersId, _ownersNames,
+        { from: _userAddress }
+      );
+    } catch (e) {
+      console.warn(e);
+    }
 
     /*if(wasRegistered) {
       this.setState({ 
@@ -205,6 +245,13 @@ class RegisterView extends React.Component {
 
     if (!accounts || !accounts[0]) {
       console.log("There is no account.");
+      this.setState({
+        dialog: {
+          open: true,
+          title: 'Sin cuenta activa',
+          description: 'Ninguna cuenta está conectada. Por favor, inicie sesión.'
+        }
+      });
       return false;
     }
 
@@ -237,18 +284,26 @@ class RegisterView extends React.Component {
           employeeAdress: vehicle.employeeAddress
         }
       }
+
+      this.setState({
+        loading: false,
+        success: true,
+      });
+
       console.log("watchForRegisterLog", vehicleLogs);
       vehicleRegisteredEvent.stopWatching();
     });
   }
   /*-------------------------- HANDLERS ------------------------------------*/
 
-  updateStates = (newObject) => {
+  updateStates = (newObject, callback) => {
     this.setState({
       ...newObject,
       disabled: false
     }, () => {
-      console.log(this.state);
+      if (callback) {
+        callback();
+      }
     });
   }
 
@@ -273,8 +328,27 @@ class RegisterView extends React.Component {
 
     if (!accounts || !accounts[0]) {
       console.log("There is no account.");
+      this.setState({
+        dialog: {
+          open: true,
+          title: 'Sin cuenta activa',
+          description: 'Ninguna cuenta está conectada. Por favor, inicie sesión.'
+        }
+      });
       return false;
     }
+
+    const photos = await this.getImagesWithNames(this.state.images, this.state.imagesNames);
+    const documents = await this.getImagesWithNames(this.state.documents, this.state.documentsNames);
+    const photosUrl = this.getUrlFromContract(photos);
+    const documentsUrl = this.getUrlFromContract(documents);
+
+    this.setState({
+      images: photosUrl.splice(0, photosUrl.length / 2),
+      imagesNames: photosUrl,
+      documents: documentsUrl.splice(0, documentsUrl.length / 2),
+      documentsNames: documentsUrl
+    });
 
     let _numberPlate = this.state.numberPlate;
     let _brand = this.state.marca;
@@ -283,8 +357,8 @@ class RegisterView extends React.Component {
     let _serialNumber = this.state.serialNumber;
     let _motorNumber = this.state.motorNumber;
     let _reason = this.state.reason;
-    let _photos = await this.imageToIpfsString(this.state.images).catch(e => console.log(e));
-    let _documents = await this.imageToIpfsString(this.state.documents).catch(e => console.log(e));
+    let _photos = photos; //"QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm,PHOTO1";
+    let _documents = documents; //"QmfSPakJG6BgQkRmDusF2t5mzz5MYEJgtz6bTdZh3ac6jm,DOC1";
     let _owners = this.getOwnersDetail(this.state.owners);
     let _ownersId = _owners[0];
     let _ownersNames = _owners[1];
@@ -295,6 +369,12 @@ class RegisterView extends React.Component {
       _photos, _documents, _ownersId, _ownersNames,
       accounts[0]
     );
+  }
+
+  getImagesWithNames = async (images, imagesNames) => {
+    let imagesString = await this.imageToIpfsString(images).catch(e => console.log(e));
+    let imagesNamesString = imagesNames.join();
+    return images.length === 0 ? "" : imagesString + "," + imagesNamesString;
   }
 
   imageToIpfsString = async (images) => {
@@ -318,6 +398,11 @@ class RegisterView extends React.Component {
     const reader = new FileReader();
 
     return new Promise((resolve, reject) => {
+
+      if (!file.preview) {
+        resolve(file);
+      }
+
       reader.onerror = () => {
         reader.abort();
         reject(new DOMException("Problem parsing input file."));
@@ -355,6 +440,10 @@ class RegisterView extends React.Component {
     });
   }
 
+  getUrlFromContract = (url) => {
+    return url.length === 0 ? [] : url.split(",");
+  }
+
   manageVehiclesDetail = async (vehicles) => {
     let promises = [];
 
@@ -371,14 +460,13 @@ class RegisterView extends React.Component {
     }
   }
 
-
   handleNext = async () => {
     const activeStep = this.state.activeStep;
     let goToNext = false;
     let message = "";
 
     switch (activeStep) {
-      case 0:
+      case 0: // Info
 
         const inputs = this.state.inputs;
         if (!inputs) {
@@ -388,7 +476,7 @@ class RegisterView extends React.Component {
 
         await this.vehicleInfoChild.current.validateInputs();
 
-        const invalidInputs = Object.entries(inputs.errors).filter((e) => {
+        const invalidInputs = Object.entries(this.state.inputs.errors).filter((e) => {
           return e[1] === true;
         });
 
@@ -417,38 +505,116 @@ class RegisterView extends React.Component {
 
         goToNext = true;
         break;
-      case 1:
+
+      case 1: // Photos
+
+        await this.vehicleImagesChild.current.validateInputs();
+
+        const imagesErrors = this.state.imagesNamesErrors.filter((error) => {
+          return error === true;
+        });
+
+        if (imagesErrors.length > 0) {
+          message = "Las fotos requieren un nombre.";
+          break;
+        }
+
         goToNext = true;
         break;
-      case 2:
+
+      case 2: // Documents
+
+        await this.vehicleDocumentsChild.current.validateInputs();
+
+        let documentsErrors = this.state.documentsNamesErrors.filter((error) => {
+          return error === true;
+        });
+
+        if (documentsErrors.length > 0) {
+          message = "Los documentos requieren un nombre.";
+          break;
+        }
+
         goToNext = true;
         break;
-      case 3:
+
+      case 3: // Owners
+        if (this.state.owners.length < 1) {
+          message = "El vehículo debe poseer un propietario como mínimo.";
+          break;
+        }
+
+        message = "El vehículo no ha sido registrado.";
+        this.setState({
+          success: false,
+          loading: true,
+        });
+
         goToNext = await this.handleRegisterVehicle();
         break;
+
       default:
         break;
     }
 
+    this.setState({
+      loading: false,
+      success: false,
+    });
+
     if (goToNext) {
+      console.log(this.state);
       this.setState({
         activeStep: activeStep + 1,
+        disabled: true
+      }, () => {
+        console.log(this.state);
       });
     } else {
-      alert(message);
+      //alert(message);
+      console.log(message);
+      this.setState({
+        dialog: {
+          open: true,
+          title: 'Aviso',
+          description: message
+        }
+      }, () => {
+        console.log(this.state);
+      });
     }
   };
 
   handleBack = () => {
-    const { activeStep } = this.state;
     this.setState({
-      activeStep: activeStep - 1,
+      activeStep: this.state.activeStep - 1,
+    }, () => {
+      console.log(this.state);
     });
   };
 
+  handleClose = () => {
+    this.setState({
+      dialog: {
+        open: false
+      }
+    });
+  };
+
+
   render() {
     const { classes } = this.props;
-    const { activeStep } = this.state;
+    const { loading, success, activeStep } = this.state;
+    const previewDivStyle = {
+      textAlign: 'center'
+    };
+    const previewStyle = {
+      display: 'inline',
+      minWidth: 500,
+      minHeight: 400,
+      maxWidth: 500,
+      maxHeight: 400
+    };
 
     return (
       <div>
@@ -470,11 +636,16 @@ class RegisterView extends React.Component {
                     Has completado el ingreso de datos
                   </Typography>
                   <Typography variant="subheading">
-                    En breve, el vehículo será registrado en el sistema.
+                    En breve, se procesarán los datos del vehículo.
                   </Typography>
-                  <div>
-                  <img src={'http://img.hb.aicdn.com/b8a424268462760d5de121b6f00b2825b8da36ca75e7a-krbIE7_fw658'} />
-                  </div>
+                  {success && (
+                    <div style={previewDivStyle}>
+                      <img
+                        alt="defaultImage"
+                        src={'http://img.hb.aicdn.com/b8a424268462760d5de121b6f00b2825b8da36ca75e7a-krbIE7_fw658'}
+                        style={previewStyle} />
+                    </div>
+                  )}
                 </React.Fragment>
               ) : (
                   <React.Fragment>
@@ -488,6 +659,7 @@ class RegisterView extends React.Component {
                             color="primary"
                             onClick={this.handleBack}
                             className={classes.button}>
+                            <BeforeIcon className={classes.leftIcon} />
                             Regresar
                           </Button>
                         )
@@ -495,9 +667,15 @@ class RegisterView extends React.Component {
                       <Button
                         variant="contained"
                         color="primary"
+                        disabled={loading}
                         onClick={this.handleNext}
                         className={classes.button}>
                         {activeStep === steps.length - 1 ? 'Terminar' : 'Siguiente'}
+                        {activeStep === steps.length - 1 ?
+                          (<CheckIcon className={classes.rightIcon} />) :
+                          (<NextIcon className={classes.rightIcon} />)
+                        }
+                        {loading && <CircularProgress size={18} className={classes.buttonProgress} />}
                       </Button>
                     </div>
                   </React.Fragment>
@@ -505,6 +683,28 @@ class RegisterView extends React.Component {
             </React.Fragment>
           </Paper>
         </main>
+
+        <Dialog
+          fullWidth
+          open={this.state.dialog.open}
+          onClose={this.handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description">
+          <DialogTitle id="alert-dialog-title">
+            {this.state.dialog.title || ''}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {this.state.dialog.description || ''}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color="primary" autoFocus>
+              OK
+          </Button>
+          </DialogActions>
+        </Dialog>
+
       </div>
     );
   }
