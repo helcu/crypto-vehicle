@@ -200,44 +200,47 @@ class RegisterView extends React.Component {
 
   watchForRegisterLog = async (_numberPlate) => {
     const web3 = this.state.web3;
-    const accounts = await web3.eth.accounts;
+    var accounts;
 
-    if (!accounts || !accounts[0]) {
-      console.log("There is no account.");
-      return false;
-    }
-
-    let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
-      { numberPlate: web3.fromAscii(_numberPlate), employeeAddress: accounts[0] },
-      { toBlock: 'latest' }
-    );
-
-    vehicleRegisteredEvent.watch((error, log) => {
-      if (error) {
-        return;
+    web3.eth.getAccounts(async(e,a)=>{
+      accounts = a;
+      if (!accounts || !accounts[0]) {
+        console.log("There is no account.");
+        return false;
       }
-
-      const vehicle = log.args;
-      const vehicleLogs = {
-        event: log.event,
-        blockHash: log.blockHash,
-        transactionHash: log.transactionHash,
-        vehicle: {
-          numberPlate: web3.toAscii(vehicle.numberPlate),
-          marca: web3.toAscii(vehicle.brand),
-          modelo: web3.toAscii(vehicle.model),
-          color: web3.toAscii(vehicle.color),
-          serialNumber: web3.toAscii(vehicle.serialNumber),
-          motorNumber: web3.toAscii(vehicle.motorNumber),
-          reason: web3.toAscii(vehicle.reason),
-          photos: vehicle.photos,
-          documents: vehicle.documents,
-          owners: this.getOwnersFromContract(this.elementsToAscii(vehicle.ownersId), this.elementsToAscii(vehicle.ownersNames)),
-          employeeAdress: vehicle.employeeAddress
+  
+      let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
+        { numberPlate: web3.fromAscii(_numberPlate), employeeAddress: accounts[0] },
+        { toBlock: 'latest' }
+      );
+  
+      vehicleRegisteredEvent.watch((error, log) => {
+        if (error) {
+          return;
         }
-      }
-      console.log("watchForRegisterLog", vehicleLogs);
-      vehicleRegisteredEvent.stopWatching();
+  
+        const vehicle = log.args;
+        const vehicleLogs = {
+          event: log.event,
+          blockHash: log.blockHash,
+          transactionHash: log.transactionHash,
+          vehicle: {
+            numberPlate: web3.toAscii(vehicle.numberPlate),
+            marca: web3.toAscii(vehicle.brand),
+            modelo: web3.toAscii(vehicle.model),
+            color: web3.toAscii(vehicle.color),
+            serialNumber: web3.toAscii(vehicle.serialNumber),
+            motorNumber: web3.toAscii(vehicle.motorNumber),
+            reason: web3.toAscii(vehicle.reason),
+            photos: vehicle.photos,
+            documents: vehicle.documents,
+            owners: this.getOwnersFromContract(this.elementsToAscii(vehicle.ownersId), this.elementsToAscii(vehicle.ownersNames)),
+            employeeAdress: vehicle.employeeAddress
+          }
+        }
+        console.log("watchForRegisterLog", vehicleLogs);
+        //vehicleRegisteredEvent.stopWatching();
+      });
     });
   }
   /*-------------------------- HANDLERS ------------------------------------*/

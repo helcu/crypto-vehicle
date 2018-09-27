@@ -204,7 +204,7 @@ class HomeView extends React.Component {
         logs.map(async (log) => {
           await this.insertLog(log);
         });
-        vehicleRegisteredEvent.stopWatching();
+        //vehicleRegisteredEvent.stopWatching();
       });
     });
     
@@ -233,8 +233,9 @@ class HomeView extends React.Component {
         logs.map(async (log) => {
           await this.insertLog(log);
         });
-        vehicleUpdatedEvent.stopWatching();
+        
       });
+      //vehicleUpdatedEvent.stopWatching();
     })
     
   }
@@ -250,8 +251,9 @@ class HomeView extends React.Component {
       logs.forEach(async (log, i) => {
         await this.insertLog(log);
       });
-      vehicleAllEvent.stopWatching();
+     
     });
+    //vehicleAllEvent.stopWatching();
   }
 
   watchForRegisterLog = async () => {
