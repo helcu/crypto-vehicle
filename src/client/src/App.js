@@ -179,7 +179,7 @@ class Main extends React.Component {
               <Route
                 exact
                 path="/update"
-                render={(props) => <UpdateView {...props} numberPlate={'AWS-321'} />} />
+                render={(props) => <UpdateView {...props} numberPlate={'QWE-123'} />} />
               <Redirect
                 from="/"
                 to="/home" />

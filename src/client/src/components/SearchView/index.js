@@ -89,6 +89,16 @@ function Transition(props) {
   return <Slide direction="up" {...props} />;
 }
 
+const events = {
+  names: {
+    VehicleRegistered: 'REGISTRO',
+    VehicleUpdated: 'ACTUALIZACIÓN'
+  },
+  realNames: {
+    VehicleRegistered: 'VehicleRegistered',
+    VehicleUpdated: 'VehicleUpdated'
+  }
+};
 
 class SearchView extends React.Component {
 
@@ -115,6 +125,7 @@ class SearchView extends React.Component {
         owners: [],
         date: ""
       },
+      logs: [],
       web3: null,
       vehicleFactoryInstance: null
     };
@@ -138,6 +149,188 @@ class SearchView extends React.Component {
     vehicleFactory.setProvider(this.state.web3.currentProvider);
     const vehicleFactoryInstance = await vehicleFactory.deployed();
     await this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
+  }
+
+
+  elementsToAscii = (_hexArray) => {
+    return _hexArray.map((e) => {
+      return this.state.web3.toAscii(e);
+    });
+  }
+
+  getOwnersFromContract = (ownersId, ownersName) => {
+    return ownersId.map((e, i) => {
+      return {
+        dni: e,
+        name: ownersName[i]
+      }
+    });
+  }
+
+
+  getRegisterLogs = async (_numberPlate) => {
+    const web3 = this.state.web3;
+    const accounts = await web3.eth.accounts;
+
+    if (!accounts || !accounts[0]) {
+      console.log("There is no account.");
+      return false;
+    }
+
+    let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
+      { numberPlate: web3.fromAscii(_numberPlate) },
+      { fromBlock: 0, toBlock: 'latest' }
+    );
+    vehicleRegisteredEvent.get((error, logs) => {
+      if (error) {
+        console.warn(error);
+        return;
+      }
+      logs.map(async (log) => {
+        await this.insertLog(log);
+      });
+      vehicleRegisteredEvent.stopWatching();
+    });
+  }
+
+  getUpdateLogs = async (_numberPlate) => {
+    const web3 = this.state.web3;
+    const accounts = await web3.eth.accounts;
+
+    if (!accounts || !accounts[0]) {
+      console.log("There is no account.");
+      return false;
+    }
+
+    let vehicleUpdatedEvent = this.state.vehicleFactoryInstance.VehicleUpdated(
+      { numberPlate: web3.fromAscii(_numberPlate) },
+      { fromBlock: 0, toBlock: 'latest' }
+    );
+    vehicleUpdatedEvent.get((error, logs) => {
+      if (error) {
+        console.warn(error);
+        return;
+      }
+      logs.map(async (log) => {
+        await this.insertLog(log);
+      });
+      vehicleUpdatedEvent.stopWatching();
+    });
+  }
+
+  insertLog = async (log) => {
+    return new Promise(async (resolve, reject) => {
+      const isUnique = this.state.logs.filter((l) => {
+        return l.transactionHash === log.transactionHash;
+      });
+
+      if (isUnique.length === 0) {
+        switch (log.event) {
+          case 'VehicleRegistered':
+            log = await this.getInfoFromRegisterLog(log);
+            break;
+          case 'VehicleUpdated':
+            log = await this.getInfoFromUpdateLog(log);
+            break;
+          default:
+            reject();
+            break;
+        }
+
+        let logs = this.state.logs;
+        logs.unshift(log);
+
+        this.setState({
+          logs: logs
+        }, () => {
+          //console.log("STATE: ", this.state);
+          resolve();
+        });
+      }
+    });
+  }
+
+  getInfoFromRegisterLog = async (log) => {
+    const web3 = this.state.web3;
+    const block = await this.getBlock(log.blockNumber);
+    const vehicle = log.args;
+    return {
+      event: log.event,
+      blockHash: log.blockHash,
+      blockNumber: log.blockNumber,
+      transactionHash: log.transactionHash,
+      gasUsed: block.gasUsed,
+      timestamp: block.timestamp,
+      vehicle: {
+        numberPlate: web3.toAscii(vehicle.numberPlate),
+        marca: web3.toAscii(vehicle.brand),
+        modelo: web3.toAscii(vehicle.model),
+        color: web3.toAscii(vehicle.color),
+        serialNumber: web3.toAscii(vehicle.serialNumber),
+        motorNumber: web3.toAscii(vehicle.motorNumber),
+        reason: web3.toAscii(vehicle.reason),
+        photos: vehicle.photos,
+        documents: vehicle.documents,
+        owners: this.getOwnersFromContract(this.elementsToAscii(vehicle.ownersId), this.elementsToAscii(vehicle.ownersNames)),
+        employeeAddress: vehicle.employeeAddress
+      }
+    }
+  }
+
+  getInfoFromUpdateLog = async (log) => {
+    const web3 = this.state.web3;
+    const block = await this.getBlock(log.blockNumber);
+    const vehicle = log.args;
+    return {
+      event: log.event,
+      blockHash: log.blockHash,
+      blockNumber: log.blockNumber,
+      transactionHash: log.transactionHash,
+      gasUsed: block.gasUsed,
+      timestamp: block.timestamp,
+      vehicle: {
+        numberPlate: web3.toAscii(vehicle.numberPlate),
+        color: web3.toAscii(vehicle.color),
+        serialNumber: web3.toAscii(vehicle.serialNumber),
+        motorNumber: web3.toAscii(vehicle.motorNumber),
+        reason: web3.toAscii(vehicle.reason),
+        photos: vehicle.photos,
+        documents: vehicle.documents,
+        owners: this.getOwnersFromContract(this.elementsToAscii(vehicle.ownersId), this.elementsToAscii(vehicle.ownersNames)),
+        employeeAddress: vehicle.employeeAddress
+      }
+    }
+  }
+
+  getBlock = async (blockNumber) => {
+    return new Promise((resolve, reject) => {
+      this.state.web3.eth.getBlock(blockNumber, false, (error, block) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve({
+          gasUsed: block.gasUsed,
+          timestamp: this.getDateFormat(block.timestamp)
+        });
+      })
+    });
+  }
+
+  getDateFormat = (timestamp = 0) => {
+    var x = new Date(timestamp * 1000);
+    var y = x.getFullYear().toString();
+    var m = (x.getMonth() + 1).toString();
+    var d = x.getDate().toString();
+    var hh = x.getHours().toString();
+    var mm = x.getMinutes().toString();
+    var ss = x.getSeconds().toString();
+    (d.length === 1) && (d = '0' + d);
+    (m.length === 1) && (m = '0' + m);
+    (hh.length === 1) && (hh = '0' + hh);
+    (mm.length === 1) && (mm = '0' + mm);
+    (ss.length === 1) && (ss = '0' + ss);
+    return d + '/' + m + '/' + y + ' - ' + hh + ':' + mm + ':' + ss;
   }
 
   execGetVehicleFiltered = async (_numberPlate) => {
@@ -214,7 +407,7 @@ class SearchView extends React.Component {
   manageVehicleDetail = async (_numberPlate) => {
     const vehicle = await this.execGetVehicleDetail(_numberPlate);
     const vehicleMapped = this.mappingVehicleDetailFromContract(vehicle);
-    this.setState({vehicle: vehicleMapped});
+    this.setState({ vehicle: vehicleMapped });
 
   }
 
@@ -249,6 +442,9 @@ class SearchView extends React.Component {
   handleClickOpen = async (numberPlate) => {
 
     await this.manageVehicleDetail(numberPlate)
+    await this.getRegisterLogs(numberPlate)
+    await this.getUpdateLogs(numberPlate)
+    console.log(this.state)
     this.setState({ open: true });
   };
 
@@ -340,14 +536,14 @@ class SearchView extends React.Component {
           <Grid container direction='row' md={12} lg={12} alignItems='baseline' spacing={24} justify='center'>
             {
               this.state.vehiclesFiltered.map(cardVehicle => (
-                <ImgMediaCard numberPlate={cardVehicle.numberPlate} brand={cardVehicle.brand} model={cardVehicle.model} image={cardVehicle.image} handleOpenDialog= {this.handleClickOpen} />
+                <ImgMediaCard numberPlate={cardVehicle.numberPlate} brand={cardVehicle.brand} model={cardVehicle.model} image={cardVehicle.image} handleOpenDialog={this.handleClickOpen} />
               ))
             }
           </Grid>
 
         </main>
 
-      <Dialog
+        <Dialog
           fullScreen
           open={this.state.open}
           onClose={this.handleClose}
@@ -361,10 +557,10 @@ class SearchView extends React.Component {
               <Typography variant="title" color="inherit" className={classes.flex}>
                 Detalle
               </Typography>
-              
+
             </Toolbar>
           </AppBar>
-          <DetailBody vehicle = {this.state.vehicle}/>
+          <DetailBody vehicle={this.state.vehicle} logs={this.state.logs}/>
         </Dialog>
 
       </div>)
