@@ -62,12 +62,12 @@ class GaugeItem extends React.Component {
     const { classes } = this.props;
 
     return (
-      <Grid item sm={3}>
+      <Grid item sm={4}>
         <Paper className={classes.paper}>
           <Typography variant="body2" align="center" >
             {this.props.title}
           </Typography>
-          <Typography variant="display3" align="center">
+          <Typography variant="display2" align="center">
             {this.state.value}
           </Typography>
         </Paper>

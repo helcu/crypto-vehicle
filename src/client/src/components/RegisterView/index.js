@@ -147,6 +147,32 @@ class RegisterView extends React.Component {
       });
 
     await this.setState({ web3: results.web3 }, () => {
+      this.state.web3.eth.getTransactionReceiptMined = function getTransactionReceiptMined(txHash, interval) {
+        const self = this;
+        const transactionReceiptAsync = function (resolve, reject) {
+          self.getTransactionReceipt(txHash, (error, receipt) => {
+            console.log("PREGUNTANDO...", receipt);
+            if (error) {
+              reject(error);
+            } else if (receipt == null) {
+              setTimeout(
+                () => transactionReceiptAsync(resolve, reject),
+                interval ? interval : 1000);
+            } else {
+              resolve(receipt);
+            }
+          });
+        };
+
+        if (Array.isArray(txHash)) {
+          return Promise.all(txHash.map(
+            oneTxHash => self.getTransactionReceiptMined(oneTxHash, interval)));
+        } else if (typeof txHash === "string") {
+          return new Promise(transactionReceiptAsync);
+        } else {
+          throw new Error("Invalid Type: " + txHash);
+        }
+      };
       this.initContracts();
     });
   }
@@ -201,9 +227,10 @@ class RegisterView extends React.Component {
 
     _ownersId = this.elementsToHex(_ownersId);
     _ownersNames = this.elementsToHex(_ownersNames);
-    let wasRegistered = false;
+
+    var txHash = false;
     try {
-      wasRegistered = await vehicleFactoryInstance.registerVehicle(
+      txHash = await vehicleFactoryInstance.registerVehicle(
         web3.fromAscii(_numberPlate), web3.fromAscii(_brand), web3.fromAscii(_model),
         web3.fromAscii(_color), web3.fromAscii(_serialNumber), web3.fromAscii(_motorNumber), web3.fromAscii(_reason),
         _photos, _documents, _ownersId, _ownersNames,
@@ -213,30 +240,38 @@ class RegisterView extends React.Component {
       console.warn(e);
     }
 
-
-    /*if(wasRegistered) {
-      this.setState({ 
-        operation: {
-          status: "onPending",
-          message: "Procesando el registro del vehículo."
-        }
+    if (txHash) {
+      await this.props.updateLogState({
+        transactionHash: txHash.tx,
+        event: 'VehicleRegistered',
+        numberPlate: _numberPlate,
+        timestamp: Math.floor(Date.now() / 1000)
       });
-    } else {
-      this.setState({ 
-        operation: {
-          status: "onError",
-          message: "Ocurrió un error al registrar el vehículo."
-        }
-      });
-    }*/
 
-    if (wasRegistered) {
-      this.watchForRegisterLog(_numberPlate);
+      let receipt = await this.state.web3.eth.getTransactionReceiptMined(txHash.tx);
+      console.log(_numberPlate, await this.execGetVehicleDetail(_numberPlate));
+      console.log("receipt: ", receipt);
+      if (receipt.logs.length > 1) {
+        console.warn("receipt.logs", receipt.logs);
+      }
+
+      setTimeout(async () => {
+        await this.props.updateLogState({
+          transactionHash: receipt.transactionHash,
+          timestamp: Math.floor(Date.now() / 1000)
+        });
+
+        this.setState({
+          loading: false,
+          success: true,
+        });
+      }, 1500);
+
     } else {
       console.log("execRegisterVehicle: failed");
     }
 
-    return wasRegistered;
+    return txHash;
   }
 
   watchForRegisterLog = async (_numberPlate) => {
@@ -291,6 +326,9 @@ class RegisterView extends React.Component {
         success: true,
       });
 
+      this.props.updateLogState(
+        log
+      );
       console.log("watchForRegisterLog", vehicleLogs);
       //vehicleRegisteredEvent.stopWatching();
     });
@@ -337,7 +375,6 @@ class RegisterView extends React.Component {
   handleRegisterVehicle = async () => {
     var accounts = await this.getAccounts();
     console.log(accounts);
-
     if (!accounts || !accounts[0]) {
       console.log("There is no account.");
       this.setState({
@@ -658,8 +695,6 @@ class RegisterView extends React.Component {
                         style={previewStyle} />
                     </div>
                   )}
-
-
                 </React.Fragment>
               ) : (
                   <React.Fragment>

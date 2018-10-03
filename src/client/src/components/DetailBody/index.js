@@ -130,7 +130,8 @@ class DetailBody extends React.Component {
       }) : [{
         original: require('../Images/car.png'),
         thumbnail: require('../Images/car.png'),
-      }]})
+      }]
+    })
 
     this.setState({ selectedIndex: index });
 
@@ -256,23 +257,23 @@ class DetailBody extends React.Component {
                 </Typography>
 
                 <List component="nav">
-                {
-                  this.state.logs.map( (obj, index) => (
+                  {
+                    this.state.logs.map((obj, index) => (
 
-                    <ListItem
-                    button 
-                    selected={this.state.selectedIndex === index }
-                    onClick={() => this.handleListItemClick(index)}
-                  >
-                    <ListItemIcon>
-                      {obj.event == 'VehicleRegistered'?  <ClassIcon /> :  <BuildIcon /> }
-                 
-                    </ListItemIcon>
-                    {obj.event == 'VehicleRegistered'?  <ListItemText primary={obj.timestamp} secondary={'Registro'} /> :  <ListItemText primary={obj.timestamp} secondary={'Actualizacion'} /> }
-                    
-                  </ListItem>
-                   ) )
-                }
+                      <ListItem
+                        button
+                        selected={this.state.selectedIndex === index}
+                        onClick={() => this.handleListItemClick(index)}
+                      >
+                        <ListItemIcon>
+                          {obj.event == 'VehicleRegistered' ? <ClassIcon /> : <BuildIcon />}
+
+                        </ListItemIcon>
+                        {obj.event == 'VehicleRegistered' ? <ListItemText primary={obj.timestamp} secondary={'Registro'} /> : <ListItemText primary={obj.timestamp} secondary={'Actualización'} />}
+
+                      </ListItem>
+                    ))
+                  }
                 </List>
               </Paper>
             </Grid>
@@ -288,5 +289,3 @@ DetailBody.propTypes = {
 };
 
 export default withStyles(styles)(DetailBody);
-
-

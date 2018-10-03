@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 //import Content from './components/Content';
 import { DrizzleProvider } from 'drizzle-react';
-import { BrowserRouter} from 'react-router-dom';
-import Main from './App.js' 
+import { BrowserRouter } from 'react-router-dom';
+import Main from './App.js'
 import LoadingContainer from './components/LoadingContainer'
-import Authorizable from './buildContracts/Authorizable.json'
+import VehicleFactory from './buildContracts/VehicleFactory.json'
 import { Route, Redirect } from 'react-router-dom';
 const theme = createMuiTheme({
   palette: {
@@ -49,33 +49,33 @@ const options = {
     }
   },
   contracts: [
-    Authorizable
+    VehicleFactory
   ]
 }
 
 export class App extends React.Component {
-    render() {
-      return (
-        <BrowserRouter>
+  render() {
+    return (
+      <BrowserRouter>
         <MuiThemeProvider theme={theme}>
-        <Main />
-      </MuiThemeProvider>
+          <Main />
+        </MuiThemeProvider>
       </BrowserRouter>
-      )
-    }
+    )
   }
+}
 
 ReactDOM.render(
-    <DrizzleProvider options={options}>
-        <LoadingContainer>
-          <BrowserRouter>
-            <div>
-            <Redirect from="*" to="/" />
-            <Route exact path="/" component={App} />
-            </div>
-          </BrowserRouter>
-          </LoadingContainer>
-    </DrizzleProvider>
-    , document.getElementById('root'));
-    
+  <DrizzleProvider options={options}>
+    <LoadingContainer>
+      <BrowserRouter>
+        <div>
+          <Redirect from="*" to="/" />
+          <Route exact path="/" component={App} />
+        </div>
+      </BrowserRouter>
+    </LoadingContainer>
+  </DrizzleProvider>
+  , document.getElementById('root'));
+
 

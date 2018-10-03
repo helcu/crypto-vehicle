@@ -40,7 +40,53 @@ contract Authorizable is Ownable {
         return employees[_employeeAddress].isAdministrator;
     }
 
-    function getEmployeesAdress()
+    function getOnlyEmployeesAddresses()
+    public view returns (address[]){
+        address[] memory employeesFiltered = new address[](employeesAccounts.length);
+        uint count = 0;
+        uint i = 0;
+        for(i = 0; i<employeesAccounts.length; i++) {
+            if(employees[employeesAccounts[i]].isEmployee) {
+                employeesFiltered[i] = employeesAccounts[i];
+                count++;
+            }
+        }
+
+        address[] memory employeesResult = new address[](count);
+        uint j = 0;
+        for(i = 0; i<employeesFiltered.length; i++) {
+            if(employeesFiltered[i] != address(0)) {
+                employeesResult[j] = employeesFiltered[i];
+                j++;
+            }
+        }
+        return employeesResult;
+    }
+
+    function getOnlyAdministratorsAddresses()
+    public view returns (address[]){
+        address[] memory employeesFiltered = new address[](employeesAccounts.length);
+        uint count = 0;
+        uint i = 0;
+        for(i = 0; i<employeesAccounts.length; i++) {
+            if(employees[employeesAccounts[i]].isAdministrator) {
+                employeesFiltered[i] = employeesAccounts[i];
+                count++;
+            }
+        }
+
+        address[] memory employeesResult = new address[](count);
+        uint j = 0;
+        for(i = 0; i<employeesFiltered.length; i++) {
+            if(employeesFiltered[i] != address(0)) {
+                employeesResult[j] = employeesFiltered[i];
+                j++;
+            }
+        }
+        return employeesResult;
+    }
+
+    function getEmployeesAddresses()
     public view returns (address[]){
         return employeesAccounts;
     }
@@ -86,7 +132,6 @@ contract Authorizable is Ownable {
             employeesAccounts.push(_toAdd);
             employees[_toAdd].isInArray = true;
         }
-        
     }
 
     function removeEmployee(address _toRemove) 
