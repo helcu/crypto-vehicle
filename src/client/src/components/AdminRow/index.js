@@ -10,16 +10,27 @@ class AdminRow extends React.Component {
   constructor(props, context) {
     super(props);
     this.contracts = context.drizzle.contracts
-    this.displayData = {};
     this.dataKey = this.contracts[this.props.contract].methods.getEmployee.cacheCall(this.props.address, { address: this.props.address });
-    this.state = this.displayData;
+    this.state = {
+      employee: []
+    }
+
+    this.getEmployeeData();
   }
 	/*displayData is an object made from the return of getEmployee function in the contract
 	/*Therefore, calling displayData[0] will return dni, displyData[1] will return name and so on
   */
 
+  getEmployeeData = async () => {
+    const employee = await this.contracts[this.props.contract].methods.getEmployee(this.props.address).call();
+    this.setState({
+      employee: employee
+    });
+  }
+
   render() {
-    if (!(this.dataKey in this.props.contracts[this.props.contract]["getEmployee"])) {
+    
+    if (!this.state.employee) {
       return (
         <TableRow>
           <TableCell>Loading...</TableCell>
@@ -28,14 +39,16 @@ class AdminRow extends React.Component {
         </TableRow>
       )
     }
-    var i = 0
-    this.displayData = this.props.contracts[this.props.contract]["getEmployee"][this.dataKey].value
-    const displayObjectProps = []
-    if (this.displayData[2]) {
-      Object.keys(this.displayData).forEach((key) => {
+
+    if (this.state.employee.length !== 0) {
+
+      var i = 0
+      //this.displayData = this.props.contracts[this.props.contract]["getEmployee"][this.dataKey].value
+      const displayObjectProps = []
+      Object.keys(this.state.employee).forEach((key) => {
         if (i == key && i < 2) {
           displayObjectProps.push(
-            <TableCell key={i}>{this.context.drizzle.web3.utils.toAscii(this.displayData[key])}</TableCell>
+            <TableCell key={i}>{this.context.drizzle.web3.utils.toAscii(this.state.employee[key])}</TableCell>
           )
         }
         i++
@@ -47,8 +60,8 @@ class AdminRow extends React.Component {
               pathname: 'admins/edit',
               state: {
                 address: this.props.address,
-                dni: this.context.drizzle.web3.utils.toUtf8(this.displayData[0]),
-                name: this.context.drizzle.web3.utils.toUtf8(this.displayData[1])
+                dni: this.context.drizzle.web3.utils.toUtf8(this.state.employee[0]),
+                name: this.context.drizzle.web3.utils.toUtf8(this.state.employee[1])
               }
             }}>
             <IconButton aria-label="EDITAR">
@@ -68,9 +81,11 @@ class AdminRow extends React.Component {
           </IconButton>
         </TableCell>
       )
-      return (<TableRow>{displayObjectProps}</TableRow>)
+      return (<TableRow>{displayObjectProps}</TableRow>);
     } else {
-      return (null)
+      return (
+        null
+      );
     }
   }
 }

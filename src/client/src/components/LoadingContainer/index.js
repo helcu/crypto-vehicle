@@ -17,7 +17,7 @@ class LoadingContainer extends Component {
             CryptoVehicle no puede conectarse a la red de Ethereum.
           </Typography>
           <Typography gutterBottom noWrap>
-            Instale la extensión Metamask.
+            Conéctese a la red o instale la extensión Metamask.
           </Typography>
         </div>
       )

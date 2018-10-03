@@ -11,9 +11,9 @@ contract Authorizable is Ownable {
     struct Employee {
         bytes32 dni;
         bytes32 name;
+        bool isInArray;
         bool isAdministrator;
         bool isEmployee;
-        bool isInArray;
     }
 
     address[] public employeesAccounts;
@@ -106,14 +106,13 @@ contract Authorizable is Ownable {
     public onlyOwner {
         require(_toAdd != address(0), "You attempted to add permissions to 0x0 address.");
 
-        if(employees[_toAdd].isEmployee && !employees[_toAdd].isAdministrator) {
+        if(employees[_toAdd].isInArray) {
+            employees[_toAdd].dni = _dni;
+            employees[_toAdd].name = _name;
             employees[_toAdd].isAdministrator = true;
         } else {
-            if(!employees[_toAdd].isInArray) {
-                employeesAccounts.push(_toAdd);
-                employees[_toAdd].isInArray = true;
-            }
-            employees[_toAdd] = Employee(_dni, _name, true, true, employees[_toAdd].isInArray);
+            employees[_toAdd] = Employee(_dni, _name, true, true, true);
+            employeesAccounts.push(_toAdd);
         }
     }
 
@@ -127,10 +126,13 @@ contract Authorizable is Ownable {
     public onlyAdministrator {
         require(_toAdd != address(0), "You attempted to add permissions to 0x0 address.");
 
-        employees[_toAdd] = Employee(_dni, _name, employees[_toAdd].isAdministrator, true, employees[_toAdd].isInArray);
-        if(!employees[_toAdd].isInArray) {
+        if(employees[_toAdd].isInArray) {
+            employees[_toAdd].dni = _dni;
+            employees[_toAdd].name = _name;
+            employees[_toAdd].isEmployee = true;
+        } else {
+            employees[_toAdd] = Employee(_dni, _name, true, false, true);
             employeesAccounts.push(_toAdd);
-            employees[_toAdd].isInArray = true;
         }
     }
 

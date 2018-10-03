@@ -16,7 +16,7 @@ const defaultMessages = {
 
 const inputsPattern = {
   onChange: {
-    _toAdd: /^([a-zA-Z0-9]{1,42})$/,
+    _toAdd: /^([a-zA-Z0-9]{0,42})$/,
     _dni: /^([0-9]{0,8})$/,
     _name: /^([A-Z ]{0,31})$/
   },
