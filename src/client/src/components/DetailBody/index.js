@@ -333,7 +333,8 @@ class DetailBody extends React.Component {
                           {obj.event == 'VehicleRegistered' ? <ClassIcon /> : <BuildIcon />}
 
                         </ListItemIcon>
-                        {obj.event == 'VehicleRegistered' ? <ListItemText primary={obj.timestamp} secondary={'Registro'} /> : <ListItemText primary={obj.timestamp} secondary={'Actualizacion'} />}
+
+                        {obj.event == 'VehicleRegistered' ? <ListItemText primary={obj.timestamp} secondary={'Registro'} /> : <ListItemText primary={obj.timestamp} secondary={'Actualización'} />}
 
                       </ListItem>
                     ))
@@ -353,5 +354,3 @@ DetailBody.propTypes = {
 };
 
 export default withStyles(styles)(DetailBody);
-
-

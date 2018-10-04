@@ -139,7 +139,7 @@ class HomeView extends React.Component {
   }
 
   initContracts = async () => {
-    
+
     const contract = require('truffle-contract');
     const vehicleFactory = contract(VehicleFactoryContract);
     vehicleFactory.setProvider(this.state.web3.currentProvider);
@@ -179,13 +179,13 @@ class HomeView extends React.Component {
   getRegisterLogs = async (_numberPlate) => {
     const web3 = this.state.web3;
     var accounts;
-    web3.eth.getAccounts(async (e,a)=>{
+    web3.eth.getAccounts(async (e, a) => {
       accounts = a;
       if (!accounts || !accounts[0]) {
         console.warn("There is no account.");
         return false;
       }
-  
+
       let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
         { numberPlate: web3.fromAscii(_numberPlate) },
         { fromBlock: 0, toBlock: 'latest' }
@@ -201,20 +201,20 @@ class HomeView extends React.Component {
         //vehicleRegisteredEvent.stopWatching();
       });
     });
-    
-    
+
+
   }
 
   getUpdateLogs = async (_numberPlate) => {
     const web3 = this.state.web3;
     var accounts;
-    web3.eth.getAccounts(async(e,a)=>{
+    web3.eth.getAccounts(async (e, a) => {
       accounts = a;
       if (!accounts || !accounts[0]) {
         console.warn("There is no account.");
         return false;
       }
-  
+
       let vehicleUpdatedEvent = this.state.vehicleFactoryInstance.VehicleUpdated(
         { numberPlate: web3.fromAscii(_numberPlate) },
         { fromBlock: 0, toBlock: 'latest' }
@@ -227,11 +227,11 @@ class HomeView extends React.Component {
         logs.map(async (log) => {
           await this.insertLog(log);
         });
-        
+
       });
       //vehicleUpdatedEvent.stopWatching();
     })
-    
+
   }
 
   getAllLogs = async () => {
@@ -245,7 +245,7 @@ class HomeView extends React.Component {
       logs.forEach(async (log, i) => {
         await this.insertLog(log);
       });
-     
+
     });
     //vehicleAllEvent.stopWatching();
   }
@@ -313,7 +313,7 @@ class HomeView extends React.Component {
         this.setState({
           logs: [log, ...this.state.logs]
         }, () => {
-          console.log(log);
+          //console.log(log);
           resolve();
         });
       }
@@ -436,16 +436,15 @@ class HomeView extends React.Component {
     const { classes } = this.props;
     const { expanded } = this.state;
     const { value } = this.state;
-    
+
     return (
       <div>
         <main className={classes.layout}>
           <Grid container>
-            <Grid container item sm={12} spacing={16}>
+            <Grid container item sm={12} spacing={40}>
               <GaugeItem title="VEHÍCULOS" value={this.state.vehicleCount} />
               <GaugeItem title="TRANSACCIONES" value={this.state.logs.length} />
               <GaugeItem title="BLOQUE ACTUAL" value={this.state.currentBlock} />
-              <GaugeItem title="ARCHIVOS IPFS" value={this.state.vehicleCount} />
             </Grid>
             <Grid item sm={12}>
               <Paper className={classes.paper}>

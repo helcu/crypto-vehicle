@@ -11,9 +11,9 @@ contract Authorizable is Ownable {
     struct Employee {
         bytes32 dni;
         bytes32 name;
+        bool isInArray;
         bool isAdministrator;
         bool isEmployee;
-        bool isInArray;
     }
 
     address[] public employeesAccounts;
@@ -40,7 +40,53 @@ contract Authorizable is Ownable {
         return employees[_employeeAddress].isAdministrator;
     }
 
-    function getEmployeesAdress()
+    function getOnlyEmployeesAddresses()
+    public view returns (address[]){
+        address[] memory employeesFiltered = new address[](employeesAccounts.length);
+        uint count = 0;
+        uint i = 0;
+        for(i = 0; i<employeesAccounts.length; i++) {
+            if(employees[employeesAccounts[i]].isEmployee) {
+                employeesFiltered[i] = employeesAccounts[i];
+                count++;
+            }
+        }
+
+        address[] memory employeesResult = new address[](count);
+        uint j = 0;
+        for(i = 0; i<employeesFiltered.length; i++) {
+            if(employeesFiltered[i] != address(0)) {
+                employeesResult[j] = employeesFiltered[i];
+                j++;
+            }
+        }
+        return employeesResult;
+    }
+
+    function getOnlyAdministratorsAddresses()
+    public view returns (address[]){
+        address[] memory employeesFiltered = new address[](employeesAccounts.length);
+        uint count = 0;
+        uint i = 0;
+        for(i = 0; i<employeesAccounts.length; i++) {
+            if(employees[employeesAccounts[i]].isAdministrator) {
+                employeesFiltered[i] = employeesAccounts[i];
+                count++;
+            }
+        }
+
+        address[] memory employeesResult = new address[](count);
+        uint j = 0;
+        for(i = 0; i<employeesFiltered.length; i++) {
+            if(employeesFiltered[i] != address(0)) {
+                employeesResult[j] = employeesFiltered[i];
+                j++;
+            }
+        }
+        return employeesResult;
+    }
+
+    function getEmployeesAddresses()
     public view returns (address[]){
         return employeesAccounts;
     }
@@ -60,14 +106,13 @@ contract Authorizable is Ownable {
     public onlyOwner {
         require(_toAdd != address(0), "You attempted to add permissions to 0x0 address.");
 
-        if(employees[_toAdd].isEmployee && !employees[_toAdd].isAdministrator) {
+        if(employees[_toAdd].isInArray) {
+            employees[_toAdd].dni = _dni;
+            employees[_toAdd].name = _name;
             employees[_toAdd].isAdministrator = true;
         } else {
-            if(!employees[_toAdd].isInArray) {
-                employeesAccounts.push(_toAdd);
-                employees[_toAdd].isInArray = true;
-            }
-            employees[_toAdd] = Employee(_dni, _name, true, true, employees[_toAdd].isInArray);
+            employees[_toAdd] = Employee(_dni, _name, true, true, true);
+            employeesAccounts.push(_toAdd);
         }
     }
 
@@ -81,12 +126,14 @@ contract Authorizable is Ownable {
     public onlyAdministrator {
         require(_toAdd != address(0), "You attempted to add permissions to 0x0 address.");
 
-        employees[_toAdd] = Employee(_dni, _name, employees[_toAdd].isAdministrator, true, employees[_toAdd].isInArray);
-        if(!employees[_toAdd].isInArray) {
+        if(employees[_toAdd].isInArray) {
+            employees[_toAdd].dni = _dni;
+            employees[_toAdd].name = _name;
+            employees[_toAdd].isEmployee = true;
+        } else {
+            employees[_toAdd] = Employee(_dni, _name, true, false, true);
             employeesAccounts.push(_toAdd);
-            employees[_toAdd].isInArray = true;
         }
-        
     }
 
     function removeEmployee(address _toRemove) 
