@@ -10,6 +10,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Divider from '@material-ui/core/Divider';
 import ClassIcon from '@material-ui/icons/Class';
 import BuildIcon from '@material-ui/icons/Build';
+import EyeIcon from '@material-ui/icons/Visibility';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -63,7 +64,7 @@ const styles = theme => ({
   },
   margin: {
     padding: 15,
-    maxHeight: 350
+   
   },
 
   table: {
@@ -91,14 +92,28 @@ class DetailBody extends React.Component {
       reason: props.vehicle.reason,
       photos: props.vehicle.photos,
       owners: props.vehicle.owners,
-
-      images: props.vehicle.photos != '' ? props.vehicle.photos.map((obj) => {
+      documents: props.vehicle.documents.map((obj, i) => {
+        if (i < props.vehicle.documents.length / 2) {
+          return (
+            {
+              name: props.vehicle.documents[i + props.vehicle.documents.length / 2],
+              url: obj,
+            }
+          )
+        } else {
+          return ({});
+        }
+      }).splice(0, props.vehicle.documents.length / 2),
+      images: props.vehicle.photos != '' ? props.vehicle.photos.map((obj, i) => {
+        if (i < props.vehicle.photos.length / 2) {
         return ({
           original: 'https://gateway.ipfs.io/ipfs//' + obj,
           thumbnail: 'https://gateway.ipfs.io/ipfs//' + obj,
-        })
+        })}else {
+          return ({});
+        }
 
-      }) : [{
+      }).splice(0, props.vehicle.photos.length / 2) : [{
         original: require('../Images/car.png'),
         thumbnail: require('../Images/car.png'),
       }],
@@ -107,6 +122,12 @@ class DetailBody extends React.Component {
     }
   }
 
+
+    showDoc = (url) =>{
+
+      window.open( 'https://gateway.ipfs.io/ipfs//'  + url, "_blank")
+
+    }
 
   handleListItemClick = (index) => {
 
@@ -121,20 +142,39 @@ class DetailBody extends React.Component {
       photos: vehiLog.vehicle.photos.split(","),
       owners: vehiLog.vehicle.owners,
 
-      images: vehiLog.vehicle.photos.split(",") != '' ? vehiLog.vehicle.photos.split(",").map((obj) => {
+      documents: vehiLog.vehicle.documents.split(",").map((obj, i) => {
+        if (i < vehiLog.vehicle.documents.split(",").length / 2) {
+          return (
+            {
+              name: vehiLog.vehicle.documents[i + vehiLog.vehicle.documents.length / 2],
+              url: obj,
+            }
+          )
+        } else {
+          return ({});
+        }
+      }).splice(0,  vehiLog.vehicle.documents.length / 2),
+
+      images: vehiLog.vehicle.photos.split(",") != '' ? vehiLog.vehicle.photos.split(",").map((obj, i) => {
+        if (i < vehiLog.vehicle.photos.split(",").length / 2) {
         return ({
           original: 'https://gateway.ipfs.io/ipfs//' + obj,
           thumbnail: 'https://gateway.ipfs.io/ipfs//' + obj,
-        })
+        })}else {
+          return ({});
+        }
 
-      }) : [{
+      }).splice(0, vehiLog.vehicle.photos.length / 2) : [{
         original: require('../Images/car.png'),
         thumbnail: require('../Images/car.png'),
-      }]})
+      }]
+    })
 
     this.setState({ selectedIndex: index });
+    console.log(this.state)
 
   };
+
 
 
   render() {
@@ -211,6 +251,31 @@ class DetailBody extends React.Component {
                   <Typography variant="title" color="inherit">
                     Documentos
                         </Typography>
+
+
+                         <Table className={classes.table}>
+                    <TableHead>
+                      <TableRow>
+                        <CustomTableCell>Nombre</CustomTableCell>
+                        <CustomTableCell>Visualizar</CustomTableCell>
+
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {this.state.documents.map((row) => {
+                        return (
+                          <TableRow className={classes.row} key={row.id}>
+                            <CustomTableCell component="th" scope="row">
+                              {row.name}
+                            </CustomTableCell>
+                            <CustomTableCell>
+                            <EyeIcon onClick={() => { this.showDoc(row.url) }} /></CustomTableCell>
+
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 </Paper>
               </Grid>
 
@@ -235,7 +300,7 @@ class DetailBody extends React.Component {
                             <CustomTableCell component="th" scope="row">
                               {row.dni}
                             </CustomTableCell>
-                            <CustomTableCell>{row.name}</CustomTableCell>
+                            <CustomTableCell>  {row.name}  </CustomTableCell>
 
                           </TableRow>
                         );
@@ -256,23 +321,23 @@ class DetailBody extends React.Component {
                 </Typography>
 
                 <List component="nav">
-                {
-                  this.state.logs.map( (obj, index) => (
+                  {
+                    this.state.logs.map((obj, index) => (
 
-                    <ListItem
-                    button 
-                    selected={this.state.selectedIndex === index }
-                    onClick={() => this.handleListItemClick(index)}
-                  >
-                    <ListItemIcon>
-                      {obj.event == 'VehicleRegistered'?  <ClassIcon /> :  <BuildIcon /> }
-                 
-                    </ListItemIcon>
-                    {obj.event == 'VehicleRegistered'?  <ListItemText primary={obj.timestamp} secondary={'Registro'} /> :  <ListItemText primary={obj.timestamp} secondary={'Actualizacion'} /> }
-                    
-                  </ListItem>
-                   ) )
-                }
+                      <ListItem
+                        button
+                        selected={this.state.selectedIndex === index}
+                        onClick={() => this.handleListItemClick(index)}
+                      >
+                        <ListItemIcon>
+                          {obj.event == 'VehicleRegistered' ? <ClassIcon /> : <BuildIcon />}
+
+                        </ListItemIcon>
+                        {obj.event == 'VehicleRegistered' ? <ListItemText primary={obj.timestamp} secondary={'Registro'} /> : <ListItemText primary={obj.timestamp} secondary={'Actualizacion'} />}
+
+                      </ListItem>
+                    ))
+                  }
                 </List>
               </Paper>
             </Grid>

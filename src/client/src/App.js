@@ -218,8 +218,8 @@ class Main extends React.Component {
                 component={SearchView} />
               <Route
                 exact
-                path="/update"
-                render={(props) => <UpdateView {...props} numberPlate={'AWS-321'} />} />
+                path="/update/:id"
+                render={(props) => <UpdateView {...props}  />} />
               <Route
               exact
               name="adminEdit"

@@ -445,7 +445,7 @@ class HomeView extends React.Component {
               <GaugeItem title="VEHÍCULOS" value={this.state.vehicleCount} />
               <GaugeItem title="TRANSACCIONES" value={this.state.logs.length} />
               <GaugeItem title="BLOQUE ACTUAL" value={this.state.currentBlock} />
-              <GaugeItem title="X" value={this.state.vehicleCount} />
+              <GaugeItem title="ARCHIVOS IPFS" value={this.state.vehicleCount} />
             </Grid>
             <Grid item sm={12}>
               <Paper className={classes.paper}>

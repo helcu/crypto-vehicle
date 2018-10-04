@@ -10,6 +10,8 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
+import { Link } from 'react-router-dom';
+
 
 const styles = {
   card: {
@@ -95,6 +97,10 @@ class ImgMediaCard extends React.Component {
               alignItems="center">
               <Button size="small" color="primary" onClick={() => this.state.handleOpen(this.state.numberPlate)} className={classes.Button} >
                 Detalle
+        </Button>
+
+        <Button component={Link}  to={'/update/' + this.state.numberPlate} size="small" color="primary" className={classes.Button} >
+                Actualizar
         </Button>
             </Grid>
           </CardActions>

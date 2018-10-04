@@ -179,6 +179,10 @@ class SearchView extends React.Component {
     });
   }
 
+  getUrlFromContract = (url) => {
+    return url.length === 0 ? [] : url.split(",");
+  }
+
   getRegisterLogs = async (_numberPlate) => {
     const web3 = this.state.web3;
     const accounts = await this.getAccounts();

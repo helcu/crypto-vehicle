@@ -38,14 +38,6 @@ export const mainListItems = (
         <ListItemText primary="Registro vehicular" />
       </ListItem>
     </Link>
-    <Link to='/update' style={{ textDecoration: 'none' }} replace={true} >
-      <ListItem button>
-        <ListItemIcon>
-          <CommuteIcon />
-        </ListItemIcon>
-        <ListItemText primary="Actualización vehicular" />
-      </ListItem>
-    </Link>
   </div>
 );
 
