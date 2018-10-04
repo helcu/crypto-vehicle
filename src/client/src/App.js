@@ -672,11 +672,13 @@ class Main extends React.Component {
               <Route
                 exact
                 path="/search"
-                component={SearchView} />
+                render={(props) =>
+                  <SearchView {...props}
+                    updateLogState={this.updateLogState} />} />
               <Route
                 exact
                 path="/update/:id"
-                render={(props) => <UpdateView {...props}  />} />
+                render={(props) => <UpdateView {...props}  updateLogState={this.updateLogState} />} />
               <Route
                 exact
                 name="adminEdit"

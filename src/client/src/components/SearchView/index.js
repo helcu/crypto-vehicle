@@ -551,7 +551,7 @@ class SearchView extends React.Component {
           <Grid container direction='row' md={12} lg={12} alignItems='baseline' spacing={24} justify='center'>
             {
               this.state.vehiclesFiltered.map(cardVehicle => (
-                <ImgMediaCard numberPlate={cardVehicle.numberPlate} brand={cardVehicle.brand} model={cardVehicle.model} image={cardVehicle.image} handleOpenDialog={this.handleClickOpen} />
+                <ImgMediaCard numberPlate={cardVehicle.numberPlate} brand={cardVehicle.brand} model={cardVehicle.model} image={cardVehicle.image} handleOpenDialog={this.handleClickOpen} updateLogState={this.props.updateLogState}/>
               ))
             }
           </Grid>
