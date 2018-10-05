@@ -49,7 +49,6 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
     [theme.breakpoints.up(600 + theme.spacing.unit * 2 * 2)]: {
-
       marginRight: 'auto',
     },
   },
@@ -60,13 +59,10 @@ const styles = theme => ({
     padding: theme.spacing.unit * 3,
     minHeight: 400,
     width: 'auto',
-
   },
   margin: {
     padding: 15,
-   
   },
-
   table: {
 
   },
@@ -106,10 +102,11 @@ class DetailBody extends React.Component {
       }).splice(0, props.vehicle.documents.length / 2),
       images: props.vehicle.photos != '' ? props.vehicle.photos.map((obj, i) => {
         if (i < props.vehicle.photos.length / 2) {
-        return ({
-          original: 'https://gateway.ipfs.io/ipfs//' + obj,
-          thumbnail: 'https://gateway.ipfs.io/ipfs//' + obj,
-        })}else {
+          return ({
+            original: 'https://gateway.ipfs.io/ipfs//' + obj,
+            thumbnail: 'https://gateway.ipfs.io/ipfs//' + obj,
+          })
+        } else {
           return ({});
         }
 
@@ -123,16 +120,12 @@ class DetailBody extends React.Component {
   }
 
 
-    showDoc = (url) =>{
-
-      window.open( 'https://gateway.ipfs.io/ipfs//'  + url, "_blank")
-
-    }
+  showDoc = (url) => {
+    window.open('https://gateway.ipfs.io/ipfs//' + url, "_blank")
+  }
 
   handleListItemClick = (index) => {
-
     let vehiLog = this.state.logs[index];
-
 
     this.setState({
       color: vehiLog.vehicle.color,
@@ -146,35 +139,34 @@ class DetailBody extends React.Component {
         if (i < vehiLog.vehicle.documents.split(",").length / 2) {
           return (
             {
-              name: vehiLog.vehicle.documents[i + vehiLog.vehicle.documents.length / 2],
+              name: vehiLog.vehicle.documents.split(",")[i + vehiLog.vehicle.documents.split(",").length / 2],
               url: obj,
             }
           )
         } else {
           return ({});
         }
-      }).splice(0,  vehiLog.vehicle.documents.length / 2),
+      }).splice(0, vehiLog.vehicle.documents.split(",").length / 2),
 
-      images: vehiLog.vehicle.photos.split(",") != '' ? vehiLog.vehicle.photos.split(",").map((obj, i) => {
+      images: vehiLog.vehicle.photos !== '' ? vehiLog.vehicle.photos.split(",").map((obj, i) => {
         if (i < vehiLog.vehicle.photos.split(",").length / 2) {
-        return ({
-          original: 'https://gateway.ipfs.io/ipfs//' + obj,
-          thumbnail: 'https://gateway.ipfs.io/ipfs//' + obj,
-        })}else {
+          return ({
+            original: 'https://gateway.ipfs.io/ipfs//' + obj,
+            thumbnail: 'https://gateway.ipfs.io/ipfs//' + obj,
+          })
+        } else {
           return ({});
         }
-
-      }).splice(0, vehiLog.vehicle.photos.length / 2) : [{
+      }).splice(0, vehiLog.vehicle.photos.split(",").length / 2) : [{
         original: require('../Images/car.png'),
         thumbnail: require('../Images/car.png'),
       }]
+    }, () => {
+      console.log(this.state);
     })
 
     this.setState({ selectedIndex: index });
-    console.log(this.state)
-
   };
-
 
 
   render() {
@@ -189,7 +181,7 @@ class DetailBody extends React.Component {
                 <Paper className={classes.paper}>
                   <Typography variant="title" color="inherit">
                     Detalle
-                                     </Typography>
+                  </Typography>
                   <Grid container>
                     <Grid container xs={6} className={classes.margin} >
                       <Grid item xs={12}>
@@ -207,58 +199,45 @@ class DetailBody extends React.Component {
                           MARCA: {this.state.brand}
                         </Typography>
                       </Grid>
-
                       <Grid item xs={6}>
                         <Typography variant="body2" gutterBottom>
                           MODELO: {this.state.model}
                         </Typography>
                       </Grid>
-
                       <Grid item xs={6}>
                         <Typography variant="body2" gutterBottom>
                           COLOR: {this.state.color}
                         </Typography>
                       </Grid>
-
                       <Grid item xs={6}>
                         <Typography variant="body2" gutterBottom>
-                          NUM SERIE: {this.state.numberSerie}
+                          NÚM SERIE: {this.state.numberSerie}
                         </Typography>
                       </Grid>
-
                       <Grid item xs={6}>
                         <Typography variant="body2" gutterBottom>
-                          NUM MOTOR: {this.state.numberMotor}
+                          NÚM MOTOR: {this.state.numberMotor}
                         </Typography>
                       </Grid>
-
                       <Grid item xs={6}>
                         <Typography variant="body2" gutterBottom>
                           RAZON: {this.state.reason}
                         </Typography>
                       </Grid>
-
                     </Grid>
-
                   </Grid>
-
-
                 </Paper>
               </Grid>
-
               <Grid item xs={6}>
                 <Paper className={classes.paper}>
                   <Typography variant="title" color="inherit">
                     Documentos
-                        </Typography>
-
-
-                         <Table className={classes.table}>
+                  </Typography>
+                  <Table className={classes.table}>
                     <TableHead>
                       <TableRow>
                         <CustomTableCell>Nombre</CustomTableCell>
                         <CustomTableCell>Visualizar</CustomTableCell>
-
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -269,8 +248,7 @@ class DetailBody extends React.Component {
                               {row.name}
                             </CustomTableCell>
                             <CustomTableCell>
-                            <EyeIcon onClick={() => { this.showDoc(row.url) }} /></CustomTableCell>
-
+                              <EyeIcon onClick={() => { this.showDoc(row.url) }} /></CustomTableCell>
                           </TableRow>
                         );
                       })}
@@ -278,19 +256,16 @@ class DetailBody extends React.Component {
                   </Table>
                 </Paper>
               </Grid>
-
               <Grid item xs={6}>
                 <Paper className={classes.paper}>
                   <Typography variant="title" color="inherit">
                     Propietarios
-                        </Typography>
-
+                  </Typography>
                   <Table className={classes.table}>
                     <TableHead>
                       <TableRow>
                         <CustomTableCell>DNI</CustomTableCell>
                         <CustomTableCell>Nombre</CustomTableCell>
-
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -300,18 +275,16 @@ class DetailBody extends React.Component {
                             <CustomTableCell component="th" scope="row">
                               {row.dni}
                             </CustomTableCell>
-                            <CustomTableCell>  {row.name}  </CustomTableCell>
-
+                            <CustomTableCell>
+                              {row.name}
+                            </CustomTableCell>
                           </TableRow>
                         );
                       })}
                     </TableBody>
                   </Table>
-
-
                 </Paper>
               </Grid>
-
             </Grid>
 
             <Grid item xs={4}>
@@ -323,19 +296,14 @@ class DetailBody extends React.Component {
                 <List component="nav">
                   {
                     this.state.logs.map((obj, index) => (
-
                       <ListItem
                         button
                         selected={this.state.selectedIndex === index}
-                        onClick={() => this.handleListItemClick(index)}
-                      >
+                        onClick={() => this.handleListItemClick(index)}>
                         <ListItemIcon>
                           {obj.event == 'VehicleRegistered' ? <ClassIcon /> : <BuildIcon />}
-
                         </ListItemIcon>
-
                         {obj.event == 'VehicleRegistered' ? <ListItemText primary={obj.timestamp} secondary={'Registro'} /> : <ListItemText primary={obj.timestamp} secondary={'Actualización'} />}
-
                       </ListItem>
                     ))
                   }
