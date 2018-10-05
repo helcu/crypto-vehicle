@@ -133,7 +133,7 @@ class Main extends React.Component {
   state = {
     open: true,
     openPopOver: false,
-    home: true,
+    home: false,
     stackId: -1,
     logs: [],
     web3: null,
@@ -777,7 +777,7 @@ class Main extends React.Component {
               <Route
                 exact
                 path="/update/:id"
-                render={(props) => <UpdateView {...props}  updateLogState={this.updateLogState} />} />
+                render={(props) => <UpdateView {...props} updateLogState={this.updateLogState} />} />
               <Route
                 exact
                 name="adminEdit"
