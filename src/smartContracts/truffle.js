@@ -19,8 +19,12 @@
     etherCost = 0.4712388 ether
 */
 var path = require('path');
+require('dotenv').config();
+var HDWalletProvider = require("truffle-hdwallet-provider");
+var mnemonic = process.env.ETHEREUM_ACCOUNT_MNEMONIC;
+
 module.exports = {
-  contracts_build_directory:  path.join(__dirname,"./../client/src/buildContracts"),
+  contracts_build_directory: path.join(__dirname, "./../client/src/buildContracts"),
   networks: {
     development: {
       host: "127.0.0.1",
@@ -32,6 +36,12 @@ module.exports = {
       // gasPrice - gas price (d. 100000000000, 100 Shannon, 100 GWei, 100 nanoEther)
       // from     - from address (d. first from Ethereum client)
       // provider - web3 provider instance. If exists, ignore host and port
+    },
+    ropsten: {
+      provider: function () {
+        return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/" + process.env.INFURA_API_KEY);
+      },
+      network_id: 3
     }
   },
   solc: {
