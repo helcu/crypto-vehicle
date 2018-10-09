@@ -49,6 +49,18 @@ const inputsPattern = {
 
 let id = 0;
 
+const inputsPattern = {
+  onChange: {
+    dni: /^[0-9]{0,8}$/,
+    name: /^[a-zA-Z ]{0,31}$/
+  },
+  onBlur: {
+    dni: /^[0-9]{8}$/,
+    name: /^[a-zA-Z ]{1,31}$/
+  }
+};
+
+
 class OwnersVehicle extends React.Component {
 
   constructor(props) {
@@ -69,6 +81,7 @@ class OwnersVehicle extends React.Component {
     };
 
     id = props.owners.length;
+
   };
 
 
@@ -196,10 +209,12 @@ class OwnersVehicle extends React.Component {
           title: '',
           description: ''
         }
+
       }, () => {
         this.props.update(this.state);
       });
     }
+
   }
 
   onBlur = () => e => {
@@ -250,6 +265,7 @@ class OwnersVehicle extends React.Component {
   };
 
 
+
   render() {
     const { classes } = this.props;
 
@@ -259,6 +275,7 @@ class OwnersVehicle extends React.Component {
           Propietarios
         </Typography>
 
+
         <Grid container spacing={24}>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -266,6 +283,7 @@ class OwnersVehicle extends React.Component {
               name="dni"
               label="DNI"
               fullWidth
+
               autoComplete="off"
               value={this.state.dni}
               helperText={this.state.inputs.messages.dni}
@@ -275,11 +293,13 @@ class OwnersVehicle extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={6} >
+
             <TextField
               id="name"
               name="name"
               label="Nombre"
               fullWidth
+
               autoComplete="off"
               value={this.state.name}
               helperText={this.state.inputs.messages.name}
@@ -292,6 +312,7 @@ class OwnersVehicle extends React.Component {
               onClick={this.addOwner}>
               Agregar
               <AddIcon className={classes.rightIcon} />
+
             </Button>
           </Grid>
         </Grid>
@@ -302,6 +323,7 @@ class OwnersVehicle extends React.Component {
               <TableCell>DNI</TableCell>
               <TableCell>Nombre</TableCell>
               <TableCell>Acciones</TableCell>
+
             </TableRow>
           </TableHead>
           <TableBody>
@@ -317,6 +339,7 @@ class OwnersVehicle extends React.Component {
                   <TableCell>
                     <DeleteIcon onClick={() => { this.deleteOwner(row.dni) }} />
                   </TableCell>
+
                 </TableRow>
               );
             })}

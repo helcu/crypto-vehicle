@@ -1,4 +1,5 @@
 import React from 'react';
+
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import ReactDropzone from 'react-dropzone';
@@ -42,7 +43,6 @@ const inputsPattern = {
     document: /^[0-9A-Z ]{1,31}$/
   }
 };
-
 
 class DocumentsVehicle extends React.Component {
 
@@ -88,10 +88,12 @@ class DocumentsVehicle extends React.Component {
       documents: this.state.documents.concat(documents),
       documentsNames: documentsNames,
       documentsNamesErrors: documentsNamesErrors
+
     }, () => {
       this.props.update(this.state);
     });
   }
+
 
   onDelete = (documentPreview, i) => {
     let documents = this.state.documents;
@@ -108,6 +110,7 @@ class DocumentsVehicle extends React.Component {
       documentsNames: documentsNames,
       documentsNamesErrors: documentsNamesErrors
     }, () => {
+
       this.props.update(this.state);
     });
   }
@@ -186,12 +189,12 @@ class DocumentsVehicle extends React.Component {
 
   render() {
     const { classes } = this.props;
+
     const previewStyle = {
       display: 'inline',
       width: 100,
       height: 100,
     };
-
     return (
       <React.Fragment>
         <Typography variant="title" gutterBottom>
@@ -263,6 +266,7 @@ class DocumentsVehicle extends React.Component {
       </React.Fragment>
     );
   }
+
 }
 
 DocumentsVehicle.propTypes = {

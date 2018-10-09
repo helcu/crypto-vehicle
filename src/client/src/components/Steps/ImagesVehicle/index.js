@@ -214,6 +214,7 @@ class ImagesVehicle extends React.Component {
               }}>
             </ReactDropzone>
 
+
           </Grid>
 
           <Grid container item xs={12} sm={12} direction="row" justify="flex-end" alignItems="center">
