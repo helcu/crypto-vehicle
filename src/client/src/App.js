@@ -525,8 +525,17 @@ class Main extends React.Component {
     if (this.state.home) {
       return (
         <div>
-          <div id="particles-js">
+          <div id="particles-js" style={{
+            backgroundColor: "#2b2e41",
+            width: "100%",
+            height: "100%"
+          }}>
             <Particles
+              style={{
+                backgroundColor: "#2b2e41",
+                width: "100%",
+                height: "100%"
+              }}
               params={{
                 "particles": {
                   "number": {
@@ -777,7 +786,7 @@ class Main extends React.Component {
               <Route
                 exact
                 path="/update/:id"
-                render={(props) => <UpdateView {...props}  updateLogState={this.updateLogState} />} />
+                render={(props) => <UpdateView {...props} updateLogState={this.updateLogState} />} />
               <Route
                 exact
                 name="adminEdit"
