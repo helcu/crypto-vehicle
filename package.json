@@ -17,9 +17,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^6.0.0",
     "express": "^4.16.3",
-    "mongoose": "^5.1.4",
-    "morgan": "^1.9.0"
+    "mongoose": "^5.3.0",
+    "morgan": "^1.9.1",
+    "truffle-hdwallet-provider": "0.0.6"
   },
   "devDependencies": {
     "truffle-contract": "^1.1.11"

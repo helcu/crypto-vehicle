@@ -2,8 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 //import Content from './components/Content';
-import { BrowserRouter} from 'react-router-dom';
-import Main from './App.js' 
+import { DrizzleProvider } from 'drizzle-react';
+import { BrowserRouter } from 'react-router-dom';
+import Main from './App.js'
+import LoadingContainer from './components/LoadingContainer'
+import VehicleFactory from './buildContracts/VehicleFactory.json'
+import { Route, Redirect } from 'react-router-dom';
 const theme = createMuiTheme({
   palette: {
     primary: {
@@ -29,24 +33,49 @@ const theme = createMuiTheme({
         borderRadius: 3,
         border: 0,
         color: 'white',
-        height: 48,
+        //height: 30,
         padding: '0 20px',
-        boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
+        boxShadow: '0 3px 5px 2px rgba(64, 64, 64, .3)',
       },
     },
   },
 });
 
-export class App extends React.Component {
-    render() {
-      return (
-        <BrowserRouter>
-        <MuiThemeProvider theme={theme}>
-        <Main />
-      </MuiThemeProvider>
-      </BrowserRouter>
-      )
+const options = {
+  web3: {
+    block: false,
+    fallback: {
+      url: 'http://127.0.0.1:7545'
     }
+  },
+  contracts: [
+    VehicleFactory
+  ]
+}
+
+export class App extends React.Component {
+  render() {
+    return (
+      <BrowserRouter>
+        <MuiThemeProvider theme={theme}>
+          <Main />
+        </MuiThemeProvider>
+      </BrowserRouter>
+    )
   }
-ReactDOM.render(<App />, document.getElementById('root'));
+}
+
+ReactDOM.render(
+  <DrizzleProvider options={options}>
+    <LoadingContainer>
+      <BrowserRouter>
+        <div>
+          <Redirect from="*" to="/" />
+          <Route exact path="/" component={App} />
+        </div>
+      </BrowserRouter>
+    </LoadingContainer>
+  </DrizzleProvider>
+  , document.getElementById('root'));
+
 
