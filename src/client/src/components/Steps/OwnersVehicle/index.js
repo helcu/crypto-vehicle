@@ -49,16 +49,6 @@ const inputsPattern = {
 
 let id = 0;
 
-const inputsPattern = {
-  onChange: {
-    dni: /^[0-9]{0,8}$/,
-    name: /^[a-zA-Z ]{0,31}$/
-  },
-  onBlur: {
-    dni: /^[0-9]{8}$/,
-    name: /^[a-zA-Z ]{1,31}$/
-  }
-};
 
 
 class OwnersVehicle extends React.Component {
