@@ -34,7 +34,7 @@ const theme = createMuiTheme({
         border: 0,
         color: 'white',
         //height: 30,
-        padding: '0 20px',
+        padding: '0 19px',
         boxShadow: '0 3px 5px 2px rgba(64, 64, 64, .3)',
       },
     },
