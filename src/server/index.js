@@ -5,7 +5,7 @@ const path = require('path');
 
 const app = express();
 // Db connection
-//const { mongoose } = require('./database');
+const { mongoose } = require('./database');
 
 // Settings 
 app.set('port', process.env.PORT || 5000);
@@ -15,10 +15,11 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
-app.use('/api', require('./routes/'));
+//app.use('/api', require('./routes/'));
+app.use('/api/transactions', require('./routes/transactions.routes'));
 
 // Static Files
-app.use(express.static(path.join(__dirname, 'public')));;
+app.use(express.static(path.join(__dirname, 'build')));
 
 // Starting the server
 app.listen(app.get('port'), () => {
