@@ -3,6 +3,8 @@ const router = express.Router();
 
 const Transaction = require('../models/transaction');
 
+const Demo = require('../models/demo');
+
 router.get('/', async (req, res) => {
     try {
         const transactions = await Transaction.find();
@@ -16,6 +18,26 @@ router.get('/', async (req, res) => {
         res.send(err);
     }
 });
+
+
+router.get('/demo', async (req, res) => {
+    try {
+       const event = 'pepito';
+        const demo = new Demo({
+            name:event
+        });
+        await demo.save();
+        res.json({
+            data: demo,
+            status: 'Task saved'
+        });
+    } catch (err) {
+        console.error(err);
+        res.send(err);
+    }
+});
+
+
 
 router.post('/', async (req, res) => {
     try {

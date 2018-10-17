@@ -93,7 +93,7 @@ class DrizzleMaterialForm extends React.Component {
         if (this.state[input.name])
           asciiValue = this.context.drizzle.web3.utils.fromAscii(this.state[input.name], 32);
         else
-          asciiValue + "0x00000000000000000000"
+          asciiValue += "0x00000000000000000000"
       }
 
       inputs[input.name] = asciiValue;
