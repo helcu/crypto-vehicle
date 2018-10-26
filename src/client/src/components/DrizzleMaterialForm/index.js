@@ -85,7 +85,7 @@ class DrizzleMaterialForm extends React.Component {
     }
 
     var inputs = {};
-    this.inputs.map((input, index) => {
+    this.inputs.forEach((input, index) => {
       var asciiValue = "";
       if (index === 0)
         asciiValue = this.state[input.name]

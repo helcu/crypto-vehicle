@@ -7,7 +7,6 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
 import ClassIcon from '@material-ui/icons/Class';
 import BuildIcon from '@material-ui/icons/Build';
 import EyeIcon from '@material-ui/icons/Visibility';
@@ -35,21 +34,12 @@ const CustomTableCell = withStyles(theme => ({
   },
 }))(TableCell);
 
-
-let id = 0;
-function createData(name, calories, fat, carbs, protein) {
-  id += 1;
-  return { id, name, calories, fat, carbs, protein };
-}
-
-
 const styles = theme => ({
   layout: {
     width: 'auto',
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
     [theme.breakpoints.up(600 + theme.spacing.unit * 2 * 2)]: {
-
       marginRight: 'auto',
     },
   },
@@ -60,13 +50,10 @@ const styles = theme => ({
     padding: theme.spacing.unit * 3,
     minHeight: 400,
     width: 'auto',
-
   },
   margin: {
     padding: 15,
-   
   },
-
   table: {
 
   },
@@ -104,35 +91,32 @@ class DetailBody extends React.Component {
           return ({});
         }
       }).splice(0, props.vehicle.documents.length / 2),
-      images: props.vehicle.photos != '' ? props.vehicle.photos.map((obj, i) => {
+      images: props.vehicle.photos.length !== 1 ? props.vehicle.photos.map((obj, i) => {
         if (i < props.vehicle.photos.length / 2) {
-        return ({
-          original: 'https://gateway.ipfs.io/ipfs//' + obj,
-          thumbnail: 'https://gateway.ipfs.io/ipfs//' + obj,
-        })}else {
+          return ({
+            original: 'https://gateway.ipfs.io/ipfs//' + obj,
+            thumbnail: 'https://gateway.ipfs.io/ipfs//' + obj,
+          })
+        } else {
           return ({});
         }
-
       }).splice(0, props.vehicle.photos.length / 2) : [{
-        original: require('../Images/car.png'),
-        thumbnail: require('../Images/car.png'),
+        original: 'https://gateway.ipfs.io/ipfs/QmXo9NgtT3J94FJZ9xMJxk4Pchfjyw67V9cKeWpugwdG49',
+        thumbnail: 'https://gateway.ipfs.io/ipfs/QmXo9NgtT3J94FJZ9xMJxk4Pchfjyw67V9cKeWpugwdG49',
       }],
       logs: props.logs,
-      selectedIndex: 0,
+      selectedIndex: 0
     }
   }
 
-
-    showDoc = (url) =>{
-
-      window.open( 'https://gateway.ipfs.io/ipfs//'  + url, "_blank")
-
-    }
+  showDoc = (url) => {
+    window.open('https://gateway.ipfs.io/ipfs//' + url, "_blank")
+  }
 
   handleListItemClick = (index) => {
-
     let vehiLog = this.state.logs[index];
-
+    const documents = vehiLog.vehicle.documents.split(",");
+    const images = vehiLog.vehicle.photos.split(",");
 
     this.setState({
       color: vehiLog.vehicle.color,
@@ -141,40 +125,35 @@ class DetailBody extends React.Component {
       reason: vehiLog.vehicle.reason,
       photos: vehiLog.vehicle.photos.split(","),
       owners: vehiLog.vehicle.owners,
-
-      documents: vehiLog.vehicle.documents.split(",").map((obj, i) => {
-        if (i < vehiLog.vehicle.documents.split(",").length / 2) {
+      documents: documents.map((obj, i) => {
+        if (i < documents.length / 2) {
           return (
             {
-              name: vehiLog.vehicle.documents[i + vehiLog.vehicle.documents.length / 2],
+              name: documents[i + documents.length / 2],
               url: obj,
             }
           )
         } else {
           return ({});
         }
-      }).splice(0,  vehiLog.vehicle.documents.length / 2),
+      }).splice(0, documents.length / 2),
 
-      images: vehiLog.vehicle.photos.split(",") != '' ? vehiLog.vehicle.photos.split(",").map((obj, i) => {
-        if (i < vehiLog.vehicle.photos.split(",").length / 2) {
-        return ({
-          original: 'https://gateway.ipfs.io/ipfs//' + obj,
-          thumbnail: 'https://gateway.ipfs.io/ipfs//' + obj,
-        })}else {
+      images: images.length !== 1 ? images.map((obj, i) => {
+        if (i < images.length / 2) {
+          return ({
+            original: 'https://gateway.ipfs.io/ipfs//' + obj,
+            thumbnail: 'https://gateway.ipfs.io/ipfs//' + obj,
+          })
+        } else {
           return ({});
         }
-
-      }).splice(0, vehiLog.vehicle.photos.length / 2) : [{
-        original: require('../Images/car.png'),
-        thumbnail: require('../Images/car.png'),
-      }]
-    })
-
-    this.setState({ selectedIndex: index });
-    console.log(this.state)
-
+      }).splice(0, images.length / 2) : [{
+        original: 'https://gateway.ipfs.io/ipfs/QmXo9NgtT3J94FJZ9xMJxk4Pchfjyw67V9cKeWpugwdG49',
+        thumbnail: 'https://gateway.ipfs.io/ipfs/QmXo9NgtT3J94FJZ9xMJxk4Pchfjyw67V9cKeWpugwdG49',
+      }],
+      selectedIndex: index
+    });
   };
-
 
 
   render() {
@@ -184,14 +163,14 @@ class DetailBody extends React.Component {
         <CssBaseline />
         <main className={classes.layout}>
           <Grid container >
-            <Grid container xs={8} >
+            <Grid item container xs={8} >
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <Typography variant="title" color="inherit">
                     Detalle
-                                     </Typography>
+                  </Typography>
                   <Grid container>
-                    <Grid container xs={6} className={classes.margin} >
+                    <Grid item container xs={6} className={classes.margin} >
                       <Grid item xs={12}>
                         <ImageGallery items={this.state.images} />
                       </Grid>
@@ -207,70 +186,57 @@ class DetailBody extends React.Component {
                           MARCA: {this.state.brand}
                         </Typography>
                       </Grid>
-
                       <Grid item xs={6}>
                         <Typography variant="body2" gutterBottom>
                           MODELO: {this.state.model}
                         </Typography>
                       </Grid>
-
                       <Grid item xs={6}>
                         <Typography variant="body2" gutterBottom>
                           COLOR: {this.state.color}
                         </Typography>
                       </Grid>
-
                       <Grid item xs={6}>
                         <Typography variant="body2" gutterBottom>
                           NUM SERIE: {this.state.numberSerie}
                         </Typography>
                       </Grid>
-
                       <Grid item xs={6}>
                         <Typography variant="body2" gutterBottom>
                           NUM MOTOR: {this.state.numberMotor}
                         </Typography>
                       </Grid>
-
                       <Grid item xs={6}>
                         <Typography variant="body2" gutterBottom>
                           RAZON: {this.state.reason}
                         </Typography>
                       </Grid>
-
                     </Grid>
-
                   </Grid>
-
-
                 </Paper>
               </Grid>
-
               <Grid item xs={6}>
                 <Paper className={classes.paper}>
                   <Typography variant="title" color="inherit">
                     Documentos
-                        </Typography>
-
-
-                         <Table className={classes.table}>
+                  </Typography>
+                  <Table className={classes.table}>
                     <TableHead>
                       <TableRow>
                         <CustomTableCell>Nombre</CustomTableCell>
                         <CustomTableCell>Visualizar</CustomTableCell>
-
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {this.state.documents.map((row) => {
+                      {this.state.documents.map((row, i) => {
                         return (
-                          <TableRow className={classes.row} key={row.id}>
+                          <TableRow className={classes.row} key={row.url + i}>
                             <CustomTableCell component="th" scope="row">
                               {row.name}
                             </CustomTableCell>
                             <CustomTableCell>
-                            <EyeIcon onClick={() => { this.showDoc(row.url) }} /></CustomTableCell>
-
+                              <EyeIcon onClick={() => { this.showDoc(row.url) }} />
+                            </CustomTableCell>
                           </TableRow>
                         );
                       })}
@@ -278,40 +244,35 @@ class DetailBody extends React.Component {
                   </Table>
                 </Paper>
               </Grid>
-
               <Grid item xs={6}>
                 <Paper className={classes.paper}>
                   <Typography variant="title" color="inherit">
                     Propietarios
-                        </Typography>
-
+                  </Typography>
                   <Table className={classes.table}>
                     <TableHead>
                       <TableRow>
                         <CustomTableCell>DNI</CustomTableCell>
                         <CustomTableCell>Nombre</CustomTableCell>
-
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {this.state.owners.map((row) => {
+                      {this.state.owners.map((row, i) => {
                         return (
-                          <TableRow className={classes.row} key={row.id}>
+                          <TableRow className={classes.row} key={row.dni + i}>
                             <CustomTableCell component="th" scope="row">
                               {row.dni}
                             </CustomTableCell>
-                            <CustomTableCell>  {row.name}  </CustomTableCell>
-
+                            <CustomTableCell>
+                              {row.name}
+                            </CustomTableCell>
                           </TableRow>
                         );
                       })}
                     </TableBody>
                   </Table>
-
-
                 </Paper>
               </Grid>
-
             </Grid>
 
             <Grid item xs={4}>
@@ -319,23 +280,26 @@ class DetailBody extends React.Component {
                 <Typography variant="title" color="inherit">
                   Historial
                 </Typography>
-
                 <List component="nav">
                   {
                     this.state.logs.map((obj, index) => (
-
                       <ListItem
+                        key={obj.transactionHash}
                         button
                         selected={this.state.selectedIndex === index}
-                        onClick={() => this.handleListItemClick(index)}
-                      >
+                        onClick={() => this.handleListItemClick(index)}>
                         <ListItemIcon>
-                          {obj.event == 'VehicleRegistered' ? <ClassIcon /> : <BuildIcon />}
-
+                          {
+                            obj.event === 'VehicleRegistered' ?
+                              <ClassIcon /> :
+                              <BuildIcon />
+                          }
                         </ListItemIcon>
-
-                        {obj.event == 'VehicleRegistered' ? <ListItemText primary={obj.timestamp} secondary={'Registro'} /> : <ListItemText primary={obj.timestamp} secondary={'Actualización'} />}
-
+                        {
+                          obj.event === 'VehicleRegistered' ?
+                            <ListItemText primary={obj.timestamp} secondary={'Registro'} /> :
+                            <ListItemText primary={obj.timestamp} secondary={'Actualización'} />
+                        }
                       </ListItem>
                     ))
                   }

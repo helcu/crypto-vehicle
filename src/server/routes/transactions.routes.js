@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
         const transactions = await Transaction.find();
         res.json({
             data: transactions,
-            status: 'Tasks listed'
+            status: 'Transactions listed'
         });
     }
     catch (err) {
@@ -29,7 +29,7 @@ router.get('/demo', async (req, res) => {
         await demo.save();
         res.json({
             data: demo,
-            status: 'Task saved'
+            status: 'Transaction saved'
         });
     } catch (err) {
         console.error(err);
@@ -54,7 +54,7 @@ router.post('/', async (req, res) => {
         await transaction.save();
         res.json({
             data: transaction,
-            status: 'Task saved'
+            status: 'Transaction saved'
         });
     } catch (err) {
         console.error(err);
@@ -77,7 +77,7 @@ router.put('/:id', async (req, res) => {
         await Transaction.findByIdAndUpdate(req.params.id, transaction);
         res.json({
             data: transaction,
-            status: 'Task updated'
+            status: 'Transaction updated'
         });
     } catch (err) {
         console.error(err);
@@ -90,7 +90,7 @@ router.delete('/:id', async (req, res) => {
         await Transaction.findByIdAndRemove(req.params.id);
         res.json({
             data: req.params.id,
-            status: 'Task deleted'
+            status: 'Transaction deleted'
         });
     } catch (err) {
         console.error(err);

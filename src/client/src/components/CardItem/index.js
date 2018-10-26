@@ -9,7 +9,6 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-
 import { Link } from 'react-router-dom';
 
 
@@ -24,7 +23,7 @@ const styles = {
   media: {
     objectFit: 'cover',
   },
-  
+
   Button: {
     background: 'white',
     color: 'black',
@@ -45,12 +44,13 @@ class ImgMediaCard extends React.Component {
       numberPlate: props.numberPlate,
       brand: props.brand,
       model: props.model,
-      image: props.image == ''? require('../Images/car.png'): 'https://gateway.ipfs.io/ipfs//' + props.image,
-      handleOpen : props.handleOpenDialog
+      image: props.image === '' ?
+        'https://gateway.ipfs.io/ipfs/QmXo9NgtT3J94FJZ9xMJxk4Pchfjyw67V9cKeWpugwdG49' :
+        'https://gateway.ipfs.io/ipfs//' + props.image,
+      handleOpen: props.handleOpenDialog
     }
   }
 
-  
 
   render() {
 
@@ -64,48 +64,38 @@ class ImgMediaCard extends React.Component {
               className={classes.media}
               height="140"
               image={this.state.image}
-              title="Contemplative Reptile"
-            />
+              title="Contemplative Reptile" />
             <CardContent>
               <Typography gutterBottom variant="headline" component="h2">
                 {this.state.numberPlate}
               </Typography>
-
-              <Grid container container
+              <Grid container
                 direction="row"
                 justify="space-around"
                 alignItems="center">
-
                 <Typography gutterBottom component="h2">
                   Marca:  {this.state.brand}
                 </Typography>
-
-
                 <Typography gutterBottom component="h2">
                   Modelo: {this.state.model}
                 </Typography>
-
-
               </Grid>
-
             </CardContent>
           </CardActionArea>
           <CardActions>
-            <Grid container container
+            <Grid container
               direction="row"
               justify="flex-end"
               alignItems="center">
               <Button size="small" color="primary" onClick={() => this.state.handleOpen(this.state.numberPlate)} className={classes.Button} >
                 Detalle
-        </Button>
-
-        <Button component={Link}  to={'/update/' + this.state.numberPlate} size="small" color="primary" className={classes.Button} >
+              </Button>
+              <Button component={Link} to={'/update/' + this.state.numberPlate} size="small" color="primary" className={classes.Button} >
                 Actualizar
-        </Button>
+              </Button>
             </Grid>
           </CardActions>
         </Card>
-
       </div>
     );
   }

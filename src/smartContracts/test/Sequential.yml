@@ -1,0 +1,11 @@
+config:
+  target: 'http://crypto-vehicle.appspot.com'
+  phases:
+    - duration: 2
+      arrivalRate: 1
+scenarios:
+  - flow:
+      - loop:
+        - get:
+            url: "/api/transactions/"
+        count: 100

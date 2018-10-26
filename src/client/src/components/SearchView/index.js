@@ -89,16 +89,6 @@ function Transition(props) {
   return <Slide direction="up" {...props} />;
 }
 
-const events = {
-  names: {
-    VehicleRegistered: 'REGISTRO',
-    VehicleUpdated: 'ACTUALIZACIÓN'
-  },
-  realNames: {
-    VehicleRegistered: 'VehicleRegistered',
-    VehicleUpdated: 'VehicleUpdated'
-  }
-};
 
 class SearchView extends React.Component {
 
@@ -129,7 +119,6 @@ class SearchView extends React.Component {
       web3: null,
       vehicleFactoryInstance: null
     };
-
   }
 
   componentDidMount = async () => {
@@ -151,7 +140,6 @@ class SearchView extends React.Component {
     await this.setState({ vehicleFactoryInstance: vehicleFactoryInstance });
   }
 
-
   elementsToAscii = (_hexArray) => {
     return _hexArray.map((e) => {
       return this.state.web3.toAscii(e);
@@ -167,69 +155,50 @@ class SearchView extends React.Component {
     });
   }
 
-
-  getAccounts = async () => {
-    return new Promise((resolve, reject) => {
-      this.state.web3.eth.getAccounts(async (error, accounts) => {
-        if (error) {
-          reject(error);
-        }
-        resolve(accounts);
-      });
-    });
-  }
-
   getUrlFromContract = (url) => {
     return url.length === 0 ? [] : url.split(",");
   }
 
   getRegisterLogs = async (_numberPlate) => {
-    const web3 = this.state.web3;
-    const accounts = await this.getAccounts();
+    return new Promise((resolve, reject) => {
 
-    if (!accounts || !accounts[0]) {
-      console.log("There is no account.");
-      return false;
-    }
+      const web3 = this.state.web3;
 
-    let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
-      { numberPlate: web3.fromAscii(_numberPlate) },
-      { fromBlock: 0, toBlock: 'latest' }
-    );
-    vehicleRegisteredEvent.get((error, logs) => {
-      if (error) {
-        console.warn(error);
-        return;
-      }
-      logs.map(async (log) => {
-        await this.insertLog(log);
+      let vehicleRegisteredEvent = this.state.vehicleFactoryInstance.VehicleRegistered(
+        { numberPlate: web3.fromAscii(_numberPlate) },
+        { fromBlock: 0, toBlock: 'latest' }
+      );
+      vehicleRegisteredEvent.get((error, logs) => {
+        if (error) {
+          console.warn(error);
+          reject();
+        }
+        logs.forEach(async (log) => {
+          await this.insertLog(log);
+        });
+        resolve();
       });
-      //vehicleRegisteredEvent.stopWatching();
     });
   }
 
   getUpdateLogs = async (_numberPlate) => {
-    const web3 = this.state.web3;
-    const accounts = await this.getAccounts();
+    return new Promise((resolve, reject) => {
+      const web3 = this.state.web3;
 
-    if (!accounts || !accounts[0]) {
-      console.log("There is no account.");
-      return false;
-    }
-
-    let vehicleUpdatedEvent = this.state.vehicleFactoryInstance.VehicleUpdated(
-      { numberPlate: web3.fromAscii(_numberPlate) },
-      { fromBlock: 0, toBlock: 'latest' }
-    );
-    vehicleUpdatedEvent.get((error, logs) => {
-      if (error) {
-        console.warn(error);
-        return;
-      }
-      logs.map(async (log) => {
-        await this.insertLog(log);
+      let vehicleUpdatedEvent = this.state.vehicleFactoryInstance.VehicleUpdated(
+        { numberPlate: web3.fromAscii(_numberPlate) },
+        { fromBlock: 0, toBlock: 'latest' }
+      );
+      vehicleUpdatedEvent.get((error, logs) => {
+        if (error) {
+          console.warn(error);
+          reject();
+        }
+        logs.forEach(async (log) => {
+          await this.insertLog(log);
+        });
+        resolve();
       });
-      //vehicleUpdatedEvent.stopWatching();
     });
   }
 
@@ -423,7 +392,6 @@ class SearchView extends React.Component {
     const vehicle = await this.execGetVehicleDetail(_numberPlate);
     const vehicleMapped = this.mappingVehicleDetailFromContract(vehicle);
     this.setState({ vehicle: vehicleMapped });
-
   }
 
   onChange = () => e => {
@@ -453,14 +421,19 @@ class SearchView extends React.Component {
     });
   }
 
-
-  handleClickOpen = async (numberPlate) => {
-
-    await this.manageVehicleDetail(numberPlate)
-    await this.getRegisterLogs(numberPlate)
-    await this.getUpdateLogs(numberPlate)
-    console.log(this.state)
-    this.setState({ open: true });
+  handleClickOpen = (numberPlate) => {
+    this.setState({
+      logs: []
+    }, async () => {
+      await this.manageVehicleDetail(numberPlate);
+      await this.getRegisterLogs(numberPlate);
+      await this.getUpdateLogs(numberPlate);
+      this.setState({
+        open: true
+      }, () => {
+        console.log(this.state);
+      });
+    });
   };
 
   handleClose = () => {
@@ -497,73 +470,67 @@ class SearchView extends React.Component {
               <Grid item xs={12} sm={1}>
                 <Button sm={1} justIcon round color="primary" style={{ marginTop: 29, marginLeft: 10 }} onClick={this.onSearch} ><Search style={{ color: "#FFFFFF" }} /></Button>
               </Grid>
-
             </Grid>
 
             <Grid container justify='space-between' alignItems='center'>
-
               <FormControlLabel
                 control={
                   <Checkbox
                     checked={this.state.checkNumberPlate} onChange={this.handleChange()}
                     value="checkedA"
-                    name='checkNumberPlate'
-                  />
+                    name='checkNumberPlate' />
                 }
-                label="Placa"
-              />
+                label="Placa" />
 
               <FormControlLabel
                 control={
                   <Checkbox
                     checked={this.state.checkBrand} onChange={this.handleChange()}
                     value="checkedA"
-                    name='checkBrand'
-                  />
+                    name='checkBrand' />
                 }
-                label="Marca"
-              />
+                label="Marca" />
               <FormControlLabel
                 control={
                   <Checkbox
                     checked={this.state.checkModel} onChange={this.handleChange()}
                     value="checkedA"
-                    name='checkModel'
-                  />
+                    name='checkModel' />
                 }
-                label="Modelo"
-              />
+                label="Modelo" />
 
               <FormControlLabel
                 control={
                   <Checkbox
                     checked={this.state.checkColor} onChange={this.handleChange()}
                     value="checkedA"
-                    name='checkColor'
-                  />
+                    name='checkColor' />
                 }
-                label="Color"
-              />
+                label="Color" />
             </Grid>
-
           </Paper>
 
-          <Grid container direction='row' md={12} lg={12} alignItems='baseline' spacing={24} justify='center'>
+          <Grid item container direction='row' md={12} lg={12} alignItems='baseline' spacing={24} justify='center'>
             {
               this.state.vehiclesFiltered.map(cardVehicle => (
-                <ImgMediaCard numberPlate={cardVehicle.numberPlate} brand={cardVehicle.brand} model={cardVehicle.model} image={cardVehicle.image} handleOpenDialog={this.handleClickOpen} updateLogState={this.props.updateLogState}/>
+                <ImgMediaCard
+                  key={cardVehicle.numberPlate}
+                  numberPlate={cardVehicle.numberPlate}
+                  brand={cardVehicle.brand}
+                  model={cardVehicle.model}
+                  image={cardVehicle.image}
+                  handleOpenDialog={this.handleClickOpen}
+                  updateLogState={this.props.updateLogState} />
               ))
             }
           </Grid>
-
         </main>
 
         <Dialog
           fullScreen
           open={this.state.open}
           onClose={this.handleClose}
-          TransitionComponent={Transition}
-        >
+          TransitionComponent={Transition}>
           <AppBar className={classes.appBar}>
             <Toolbar>
               <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
@@ -572,18 +539,12 @@ class SearchView extends React.Component {
               <Typography variant="title" color="inherit" className={classes.flex}>
                 Detalle
               </Typography>
-
             </Toolbar>
           </AppBar>
           <DetailBody vehicle={this.state.vehicle} logs={this.state.logs} />
         </Dialog>
-
       </div>)
-
-
   }
-
-
 }
 
 SearchView.propTypes = {
