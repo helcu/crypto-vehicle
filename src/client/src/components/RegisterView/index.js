@@ -690,8 +690,8 @@ class RegisterView extends React.Component {
                   {success && (
                     <div style={previewDivStyle}>
                       <img
-                        alt="defaultImage"
-                        src={'http://img.hb.aicdn.com/b8a424268462760d5de121b6f00b2825b8da36ca75e7a-krbIE7_fw658'}
+                        alt="Successful"
+                        src={'https://gateway.ipfs.io/ipfs/QmW5C9fM6BdFoR8xWJV1AviapVrVvUQmyRECNkm4xqbpkM'}
                         style={previewStyle} />
                     </div>
                   )}
